@@ -1,7 +1,5 @@
 from controller import utils
 
-
-
 def main():
     print(utils.get_databases())
 

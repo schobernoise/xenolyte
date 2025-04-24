@@ -6,7 +6,6 @@ FUNCTIONS = {
     "createfolder": folders.create_folder_from_record
 }
 
-
 parser = ArgumentParser(prog='cli')
 parser.add_argument('database', help="Postional Argument, which database should it be?")
 parser.add_argument('command', help="Postional Argument, command to do with database.", nargs='?')

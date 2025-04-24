@@ -1,6 +1,10 @@
 from model import records
 from controller import utils
 import os
+import logging
+from datetime import date
+
+today = date.today()
 
 ### Folder Management ###
 
@@ -16,18 +20,28 @@ def create_folder_from_record(path,args):
     new_folder_path = os.path.join(path, folder_name)
     os.makedirs(new_folder_path, exist_ok=True)
     create_folder_note(os.path.join(new_folder_path,f"{folder_name}.md"),record)
-    print(new_folder_path)
+    logging.info(new_folder_path)
     return new_folder_path
 
 
 def create_folder_note(path,record):
+    frontmatter = f"""---
+related:
+  - 
+created:
+  - "[[{today.strftime("%d-%m-%Y-%A")}]]"
+aliases: 
+ - {record["title"]}
+tags: 
+ - ist/projekt
+Projektnummer: "{record["project_number"]}"
+attachments:
+---
 
-    frontmatter_lines = ['---']
-    for key, value in record.items():
-        frontmatter_lines.append(f"{key}: {value}")
-    frontmatter_lines.append('---\n')
+"""
+
 
     with open(path, 'w') as f:
-        f.write('\n'.join(frontmatter_lines))
-    print(path)
+        f.write(frontmatter)
+    logging.info(path)
     return path
