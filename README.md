@@ -3,7 +3,7 @@ Python-based GUI for managing local CSV Databases.
 
 ## Code Structure
 
-### /cli
+### /controller
 
 Controller for pulling data, manipulate it, hand it over to the frontend and give it back again. You can manage your databases with this cli alone, no gui needed.
 
@@ -23,7 +23,6 @@ All additional files like:
 - **database_list.json:** A List containg locations to all databases.
 
 ## Database Structure
-
 
 A Database is a Folder containing the following structure:
 
