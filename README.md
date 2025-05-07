@@ -1,5 +1,5 @@
 # py-fabi-2
-Python-based GUI for managing local CSV Databases.
+Python-based GUI for managing local CSV Databases.  
 
 ## Code Structure
 
@@ -20,26 +20,23 @@ Contains all methods to manage CSV files, treat them like a database. CRUD Opera
 All additional files like: 
 
 - **user_settings.json:** Default view, etc
-- **database_list.json:** A List containg locations to all databases.
+- **databases.csv:** A List containing locations to all databases.
 
 ## Database Structure
 
-A Database is a Folder containing the following structure:
+- database/
+    - database.csv
+    - database.json
+    - 001 record1/
+        - 001 record1.md
+        - attachments/
+            - image01.jpg
+            - document.pdf
+    - 002 record2/
+        - 002 record2.md
+        - attachments/
+            - image01.jpg
+            - document.pdf
+...
 
-stones/
-├── stones.csv
-├── stones.json
-├── stone_types.csv
-├── 1 salzach0425/
-│   ├── 1 salzach0425.md
-│   ├── attachments/
-│   │   ├── 1 salzach0425 000.jpg
-│   │   └── 1 salzach0425 001.jpg
-├── 1 goisern0625/
-│   ├── 1 goisern0625.md
-│   ├── attachments/
-│   │   ├── 1 goisern0625 000.jpg
-│   │   └── 1 goisern0625 001.jpg
-
-
-Where the leading number represents the index number in the csv file, that is named after the parent dir. The json file contains metadata for the single columns and the database itself.
+Where the leading number represents the index id in the csv file, that is named after the parent dir. The json file contains metadata for the single columns and the database itself.

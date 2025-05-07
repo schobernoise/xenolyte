@@ -2,8 +2,8 @@ from model import records
 import os
 
 def load_dotenv(filename='.env'):
-    base_dir = os.path.dirname(os.path.abspath(__file__))  # directory of the script
-    env_path = os.path.join(base_dir, '..', filename)       # go up one level
+    base_dir = os.path.dirname(os.path.abspath(__file__))  
+    env_path = os.path.join(base_dir, '..', filename)       
     env = {}
 
     with open(env_path) as f:
