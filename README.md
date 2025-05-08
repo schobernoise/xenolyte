@@ -1,5 +1,23 @@
 # py-fabi-2
-Python-based GUI for managing local CSV Databases.  
+
+Python-based GUI for managing local CSV Databases.
+
+## Tasks
+
+- [ ] Create Database Folder **Fn**
+  - [ ] Create README.md
+  - [ ] Create config.json
+  - [ ] Create Database CSV
+- [ ] Create CSV **Fn**
+  - [ ] New Database CSV
+  - [ ] Extend existing Database Folder for typing
+- [ ] Create Folder from Row
+  - [ ] Create Subfolder
+  - [ ] Add Markdown Folder Note
+  - [ ] Add attachments Folder
+
+![](data/gui development 2025.png?raw=true)
+
 
 ## Code Structure
 
@@ -9,7 +27,7 @@ Controller for pulling data, manipulate it, hand it over to the frontend and giv
 
 ### /gui
 
-PyQt6 frontend with as little logic as possible. 
+PyQt6 frontend with as little logic as possible.
 
 ### /model
 
@@ -17,7 +35,7 @@ Contains all methods to manage CSV files, treat them like a database. CRUD Opera
 
 ### /data
 
-All additional files like: 
+All additional files like:
 
 - **user_settings.json:** Default view, etc
 - **databases.csv:** A List containing locations to all databases.
@@ -25,18 +43,18 @@ All additional files like:
 ## Database Structure
 
 - database/
-    - database.csv
-    - database.json
-    - 001 record1/
-        - 001 record1.md
-        - attachments/
-            - image01.jpg
-            - document.pdf
-    - 002 record2/
-        - 002 record2.md
-        - attachments/
-            - image01.jpg
-            - document.pdf
-...
+  - database.csv
+  - config.json
+  - 001 record1/
+    - 001 record1.md
+    - attachments/
+      - image01.jpg
+      - document.pdf
+  - 002 record2/
+    - 002 record2.md
+    - attachments/
+      - image01.jpg
+      - document.pdf
+        ...
 
 Where the leading number represents the index id in the csv file, that is named after the parent dir. The json file contains metadata for the single columns and the database itself.
