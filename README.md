@@ -11,13 +11,12 @@ Python-based GUI for managing local CSV Databases.
 - [ ] Create CSV **Fn**
   - [ ] New Database CSV
   - [ ] Extend existing Database Folder for typing
-- [ ] Create Folder from Row
+- [ ] Create Folder from Row **Fn**
   - [ ] Create Subfolder
   - [ ] Add Markdown Folder Note
   - [ ] Add attachments Folder
 
-![](data/gui development 2025.png?raw=true)
-
+![](data/gui%20development%202025.png?raw=true)
 
 ## Code Structure
 
