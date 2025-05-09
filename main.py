@@ -1,7 +1,9 @@
-from controller import utils
+import controller
 
 def main():
-    print(utils.get_databases())
+    recent_vault = controller.config.check_vaults()
+    if vault:
+        print("Recent Vault")
 
 
 if __name__ == "__main__":

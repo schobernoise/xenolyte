@@ -3,7 +3,7 @@ import logging
 
 
 def read_records(file):
-    """Return all projects."""
+    """Return all records."""
     with open(file, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f, delimiter=";")
         logging.info("Reading Records.")
@@ -11,6 +11,7 @@ def read_records(file):
 
 
 def create_record(file, new_record):
+    """Create record"""
     with open(file, 'a', encoding="utf-8",newline="") as f:
         writer = csv.DictWriter(f, fieldnames=new_record.keys(), delimiter=";")
         writer.writerow(new_record) 
@@ -18,7 +19,7 @@ def create_record(file, new_record):
 
 
 def read_record(file,id):
-    """Return the row that matches the id."""
+    """Return the record that matches the id."""
     with open(file, 'r', encoding="utf-8") as f:
         reader = csv.DictReader(f, delimiter=";")
         for record in reader:
