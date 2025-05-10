@@ -1,17 +1,79 @@
-from model import records
-from controller import utils
+import model, utils
 import os
 import logging
 from datetime import date
+import shutil
 
 today = date.today()
 
+def create_new_table(path,name):
+    new_table_path = os.path.join(path,f"{name}.csv")
+    utils.create_empty_table(new_table_path)
+    logging.info("database: created new table")
 
-def create_new_database(path,args,record=False):
-    pass
+
+def create_new_database(path,name,args=False):
+    new_database_path = os.path.join(path,f"{name}")
+    utils.create_empty_folder(new_database_path)
+    utils.create_config_json(path)
+
+    new_foldernote_path = os.path.join(new_database_path,f"README.md")
+    utils.create_note(new_foldernote_path)
+
+    logging.info("database: created new database")
+    return new_database_path
     
 
-def create_database_from_table():
+def create_database_from_table(path, create_record_folders=False):
+    database_path = utils.create_empty_folder(path.replace(".csv",""))
+    shutil.move(path, database_path)
+    utils.create_config_json(database_path)
+
+    new_foldernote_path = os.path.join(database_path,f"README.md")
+    utils.create_note(new_foldernote_path)
+
+    if create_record_folders:
+        records = model.records.read_records(path)
+        for record in records:
+            utils.create_record_folder(database_path,record)
+
+    logging.info("database: created database from table")
+    return database_path
+
+
+def create_record_folder(path, id):
+    record = get_record(path,id)
+    return utils.create_record_folder(path,record)
+
+
+def load_table(path):
+    return {
+        _type: "table",
+        table: utils.fetch_table(path)
+    }
+
+
+def load_database(path):
+    database_name = utils.get_folder_name(path)
+    table_path = os.path.join(path, f"{database_name}.csv")
+    table = utils.fetch_table(table_path)
+    config = utils.get_config_json(path)
+    return {
+        _type: "database",
+        table: table,
+        config: config
+    }
+
+
+def get_record(path, id):
+    table_path = os.path.join(path, f"{database_name}.csv")
+    table = utils.fetch_table(table_path)
+    for record in table:
+            if record["id"] == id:
+                return record
+
+
+def create_record(path,id=False):
     pass
 
 
@@ -19,46 +81,4 @@ def create_functions_py():
     pass
 
 
-def create_config():
-    pass
-
-
-def create_folder_from_record(path,args,record=False):
-    # db_name = utils.get_last_folder(path)
-    # record = records.read_record(os.path.join(path,f"{db_name}.csv"),args.id)
-    # if not record["slug"]:
-    #     print("Slug is needed for folder creation.")
-    #     return
-
-    # parent_dir = os.path.dirname(os.path.abspath(path))
-    # folder_name = f"{record['id']} {record['slug']}"
-    # new_folder_path = os.path.join(path, folder_name)
-    # os.makedirs(new_folder_path, exist_ok=True)
-    # create_folder_note(os.path.join(new_folder_path,f"{folder_name}.md"),record)
-    # logging.info(new_folder_path)
-    # return new_folder_path
-    pass
-
-
-def create_record_note(path,record):
-    frontmatter = f"""---
-related:
-  - 
-created:
-  - "[[{today.strftime("%d-%m-%Y-%A")}]]"
-aliases: 
- - {record["title"]}
-tags: 
- - ist/projekt
-Projektnummer: "{record["project_number"]}"
-attachments:
----
-
-"""
-
-
-    with open(path, 'w') as f:
-        f.write(frontmatter)
-    logging.info(path)
-    return path
 

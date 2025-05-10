@@ -1,27 +1,83 @@
 from model import records
 import os
-
-def load_dotenv(filename='.env'):
-    base_dir = os.path.dirname(os.path.abspath(__file__))  
-    env_path = os.path.join(base_dir, '..', filename)       
-    env = {}
-
-    with open(env_path) as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-            if '=' in line:
-                key, value = line.split('=', 1)
-                env[key.strip()] = value.strip().strip('"').strip("'")
-    return env
-
-env_vars = load_dotenv()
-
-def get_last_folder(path):
-    return os.path.basename(os.path.normpath(path))
-
-def get_databases():
-    return records.read_records(env_vars['DATABASES'])
+import json
 
 
+CONFIG_TEMPLATE = {
+    columns: [
+        {
+            name: "id",
+            _type: "int",
+            width: 20
+        }
+    ]
+}
+
+
+def get_folder_name(path):
+    return os.path.split(os.path.normpath(path))
+
+
+def create_empty_table(path, header=["id"]):
+    if os.path.exists(path):
+        logging.error("File already exists")
+        raise FileExistsError(f"{path} already exists.")
+    else:
+        with open(path, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            if header:
+                writer.writerow(header)
+        logging.info(f"Created {path}")
+        return path
+
+
+def create_empty_folder(path):
+    pass
+
+
+def create_note(path):
+    with open(path, 'w') as f:
+        f.write()
+    logging.info(f"Created {path}")
+    return path
+
+
+def create_config_json(path):
+    new_config_path = os.path.join(path,"config.json")
+    with open(new_config_path , "w") as f:
+        json.dump(CONFIG_TEMPLATE, f, indent=4)
+    logging.info(f"Created {new_config_path }")
+    return new_config_path 
+
+
+def get_config_json(path):
+    return json.load(os.path.join(path,"config.json"))
+
+
+def create_record_folder(path, record):
+    """path: Path to the database"""
+    folder_name = f"{record['id']} {record['slug']}".strip().replace("/", "-")
+    record_folder_path = os.path.join(path, folder_name)
+
+    attachments_path = os.path.join(record_folder_path, "attachments")
+    markdown_file_path = os.path.join(record_folder_path, f"{folder_name}.md")
+
+    os.makedirs(attachments_path, exist_ok=True)
+
+    if not os.path.exists(markdown_file_path):
+        with open(markdown_file_path, "w") as f:
+            f.write(f"# {record['slug']}\n\nID: {record['id']}\n")
+
+    return record_folder_path
+
+
+def get_record_folder(path,record):
+    return f"{record['id']} {record['slug']}".strip().replace("/", "-")
+
+
+def read_markdown(path):
+    pass
+
+
+def fetch_table(path):
+    return records.read_records(table_path)

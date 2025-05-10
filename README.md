@@ -10,24 +10,34 @@ Python-based GUI for managing local CSV Databases. Using PyQt6.
 
 - [ ] Read Database Folder
   - [ ] Read Markdown File
-  - [ ] Read config.json
-  - [ ] Read database.csv
+  - [x] Read config.json
+  - [x] Read database.csv
   - [ ] Read Functions.py
 
-- [ ] Create Database Folder **Fn**
-  - [ ] Create README.md
-  - [ ] Create config.json
-  - [ ] Create Database CSV
+- [x] Create Database Folder **Fn**
+  - [x] Create README.md
+  - [x] Create config.json
+  - [x] Create Database CSV
   - [ ] Create functions.py
-- [ ] Create Table (CSV) **Fn**
-  - [ ] New Table CSV
+- [x] Create Table (CSV) **Fn**
+  - [x] New Table CSV
   - [ ] Extend existing Database Folder with more Tables for types.
-- [ ] Create Folder from Row **Fn**
-  - [ ] Create Subfolder
-  - [ ] Add Markdown Folder Note
-  - [ ] Add attachments Folder
+- [x] Create Folder from Record **Fn**
+  - [x] Create Subfolder
+  - [x] Add Markdown Folder Note
+  - [x] Add attachments Folder
 
 ![](data/gui%20development%202025.png?raw=true)
+
+
+### Future Features
+
+- Lightweight mini input form window to add new records, triggered by cli.
+- Table-Templates
+  - Frequently used table layouts like [id,title,slug,status,description] 
+- Automatic photo compression and thumbnail caching.
+- Calendar/Kanban View
+- Version controll with git, syncing vault or single databases.
 
 
 ## Concept and Terminology
@@ -76,3 +86,9 @@ Where the leading number represents the index id in the csv file that is named a
 The functions.py contains a pre-generated **class Vault**. Every method of this class gets added as a button to the toolbox area in the application and gets its own cli-command. They receive an object with an array of all vaults and all variables of config.json which enables users to create their own settings for their own functions.
 
 
+## Usecases
+
+All of the usescases can be located in any cloud service.
+
+- Cataloging a collection of fossils, rocks, plants, etc and adding metdata to it as well as photos and documents.
+- Contact list, booking catalogue, CRM
