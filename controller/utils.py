@@ -66,7 +66,7 @@ def create_record_folder(path, record):
 
     if not os.path.exists(markdown_file_path):
         with open(markdown_file_path, "w") as f:
-            f.write(f"# {record['slug']}\n\nID: {record['id']}\n")
+            f.write(f"# {record['title']}\n")
 
     return record_folder_path
 
@@ -81,3 +81,9 @@ def read_markdown(path):
 
 def fetch_table(path):
     return records.read_records(table_path)
+
+
+def fetch_record(table,id):
+    for record in table:
+            if record["id"] == id:
+                return record

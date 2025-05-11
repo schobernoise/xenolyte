@@ -66,14 +66,30 @@ def load_database(path):
 
 
 def get_record(path, id):
+    database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
     table = utils.fetch_table(table_path)
-    for record in table:
-            if record["id"] == id:
-                return record
+    return utils.fetch_record(table,id)
 
 
 def create_record(path,id=False):
+    database_name = utils.get_folder_name(path)
+    table_path = os.path.join(path, f"{database_name}.csv")
+    table = utils.fetch_table(table_path)
+    pass
+
+
+def delete_record(path,id):
+    database_name = utils.get_folder_name(path)
+    table_path = os.path.join(path, f"{database_name}.csv")
+    table = utils.fetch_table(table_path)
+    pass
+
+
+def update_record(path,id, updated_record):
+    database_name = utils.get_folder_name(path)
+    table_path = os.path.join(path, f"{database_name}.csv")
+    table = utils.fetch_table(table_path)
     pass
 
 
