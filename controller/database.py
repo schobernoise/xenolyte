@@ -69,28 +69,36 @@ def get_record(path, id):
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
     table = utils.fetch_table(table_path)
+    logging.info(f"database: Returning Record with Id {id}")
     return utils.fetch_record(table,id)
 
 
-def create_record(path,id=False):
+def create_record(path, record,id=False):
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
-    table = utils.fetch_table(table_path)
-    pass
+    model.records.create_record(table_path,record)
+    logging.info(f"database: Create Record with Id {record['id']}")
+    return record
 
 
 def delete_record(path,id):
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
     table = utils.fetch_table(table_path)
-    pass
+    updated_table = utils.remove_record_by_id(table,id)
+    model.records.overwrite_records(table_path,updated_table)
+    logging.info(f"database: Delete Record with Id {id}")
+    return id
 
 
-def update_record(path,id, updated_record):
+def update_record(path,updated_record):
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
     table = utils.fetch_table(table_path)
-    pass
+    updated_table = utils.replace_record_in_table(table,updated_record)
+    model.records.overwrite_records(table_path,updated_table)
+    logging.info(f"database: Create Record with Id {updated_record['id']}")
+    return updated_record
 
 
 def create_functions_py():

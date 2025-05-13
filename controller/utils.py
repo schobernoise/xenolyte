@@ -87,3 +87,19 @@ def fetch_record(table,id):
     for record in table:
             if record["id"] == id:
                 return record
+
+
+def replace_record_in_table(table,updated_record):
+    updated_table = table.copy()
+    for index, record in enumerate(updated_table):
+        if getattr(record, "id", None) == getattr(updated_record, "id", None):
+            updated_table[index] = updated_record
+            break
+    else:
+        updated_table.append(updated_record)
+    return updated_table
+
+
+
+def remove_record_by_id(table, id_to_remove):
+    return [record for record in table if getattr(record, "id", None) != id_to_remove]
