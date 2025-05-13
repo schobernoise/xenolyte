@@ -1,6 +1,6 @@
 # User Data
-data/user_settings.json
-data/databases.csv
+data/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

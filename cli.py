@@ -1,13 +1,59 @@
 from argparse import ArgumentParser
-from controller import utils, folders
+import controller
 from _version import __version__
+
+
+def list_vaults():
+    """
+    Retrieves and displays a list of vaults with their paths and modification times.
+    """
+    try:
+        vaults: List[Dict[str, str]] = controller.xenolyte.return_all_vaults()
+    except Exception as e:
+        print(f"Error retrieving vaults: {e}")
+        return
+
+    if not vaults:
+        print("No vaults available.")
+        return
+
+    table_data = []
+    for index, vault in enumerate(vaults, start=1):
+        path = vault.get('path', 'N/A')
+        modified_raw = vault.get('modified', '')
+        try:
+            modified_dt = datetime.fromisoformat(modified_raw)
+            modified = modified_dt.strftime('%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            modified = modified_raw  
+
+        table_data.append([index, path, modified])
+
+    headers = ["#", "Path", "Modified"]
+
+    col_widths = [max(len(str(row[i])) for row in table_data + [headers]) for i in range(3)]
+
+    row_format = ("| {:<" + str(col_widths[0]) + "} "
+                    "| {:<" + str(col_widths[1]) + "} "
+                    "| {:<" + str(col_widths[2]) + "} |")
+
+    print(row_format.format(*headers))
+    print("-" * (sum(col_widths) + 10))  
+
+    for row in table_data:
+        print(row_format.format(*row))
+
+
+def add_folder():
+    path = input("Enter existing folder path: ")
+    controller.xenolyte.append_vault(path)
+    list_vaults()
 
 
 FUNCTIONS = [
     # Vault Functions
-    ["listvaults", "List all currently selected vaults"],
-    ["addexistingfolder", "Add an existing folder as vault, [path]"],
-    ["createnewvault", "Create a new Vault in Location [path]"],
+    ["listvaults", "List all currently selected vaults", list_vaults],
+    ["addfolder", "Add an existing folder as vault, [path]", add_folder],
     ["selectvault", "Select a vault from List of Vaults, [id]"],
     ["showselectedvault", "Display currently selected vault"],
 
@@ -38,4 +84,4 @@ args = parser.parse_args()
 #         else:
 #             print(f"No such function: {args.command}")
 
-        
+

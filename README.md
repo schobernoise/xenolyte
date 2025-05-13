@@ -1,10 +1,12 @@
 # Xenolyte
 
-Python-based GUI for managing local CSV Databases. Using PyQt6.
+> Python-based GUI for managing local CSV Databases. Using PyQt6.
 
 ## Tasks
 
-- [ ] Add Vault to vaults.csv
+The plan is to get the CLI fully working before plugging it into the GUI.
+
+- [x] Add Vault to vaults.csv
 - [ ] Create .xenolyte.json
 - [ ] Read .xenolyte.json
 
@@ -27,7 +29,15 @@ Python-based GUI for managing local CSV Databases. Using PyQt6.
   - [x] Add Markdown Folder Note
   - [x] Add attachments Folder
 
-![](data/gui%20development%202025.png?raw=true)
+- [ ] CLI Tools
+  - [ ] Vaults functions
+  - [ ] Database Functions
+  - [ ] Custom Functions
+
+- [ ] PyQt6 GUI
+  - [x] Rapid Prototype
+
+![](ressources/gui%20development%202025.png?raw=true)
 
 
 ### Future Features

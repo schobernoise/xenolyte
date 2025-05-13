@@ -54,6 +54,28 @@ def get_config_json(path):
     return json.load(os.path.join(path,"config.json"))
 
 
+def update_config_json(path, updated_config):
+    config_path = os.path.join(path,"config.json")
+    try:
+        # Serialize the updated_config to JSON
+        config_json = json.dumps(updated_config, indent=4)
+
+        # Create a temporary file in the same directory
+        with tempfile.NamedTemporaryFile('w', delete=False, dir=config_path.parent, encoding='utf-8') as tmp_file:
+            tmp_file.write(config_json)
+            temp_path = Path(tmp_file.name)
+
+        # Replace the original config with the temporary file
+        config_path.replace(temp_path)
+
+        print(f"{config_path} has been atomically updated.")
+        return True
+
+    except Exception as e:
+        print(f"An error occurred during atomic update: {e}")
+        return False
+
+
 def create_record_folder(path, record):
     """path: Path to the database"""
     folder_name = f"{record['id']} {record['slug']}".strip().replace("/", "-")
