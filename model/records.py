@@ -28,9 +28,33 @@ def read_record(file,id):
         logging.info("Reading Record.")
 
 
-def overwrite_records(file,records):
-    """Overwrites all records with an updated list"""
-    with open(file, 'w+', encoding="utf-8",newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=records[-1].keys(), delimiter=";",extrasaction='ignore')
-        writer.writerows(records)
-        logging.info("Overwriting Records.")
+def overwrite_records(file, records):
+    """
+    Overwrites all records in the given CSV file with an updated list of records.
+    
+    Args:
+        file (str): The path to the CSV file to overwrite.
+        records (List[Dict[str, any]]): A list of dictionaries representing the CSV records.
+    """
+    if not records:
+        logging.warning("No records provided to overwrite. Operation skipped.")
+        return None
+    
+    try:
+        fieldnames = list(records[0].keys())
+        logging.debug(f"Determined fieldnames: {fieldnames}")
+        
+        with open(file, 'w', encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter=";", extrasaction='ignore')
+            
+            writer.writeheader()
+            logging.debug("CSV header written.")
+            
+            writer.writerows(records)
+            logging.info(f"Successfully overwrote records in {file}.")
+        
+        return file
+    
+    except Exception as e:
+        logging.error(f"Failed to overwrite records in {file}: {e}")
+        return None

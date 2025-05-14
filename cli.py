@@ -56,10 +56,8 @@ def select_vault(args=False):
     print("Type in the number of the vault you want to select.")
     list_vaults()
     select_vault = input("Select Vault: ")
-    try:
-        select_vault_path = xenolyte.return_all_vaults()[select_vault]
-    except:
-        print("Please select an existing Vault.")
+    select_vault_path = xenolyte.return_all_vaults()[int(select_vault)]["path"]
+    # TODO: Error handling for user input
     if xenolyte.set_vault_modified_now(select_vault_path):
         print(f"Selected Vault {select_vault_path}")
     else:
@@ -68,6 +66,7 @@ def select_vault(args=False):
 def show_selected_vault(args=False):
     active_vault = xenolyte.return_recent_vault()
     print(f"{active_vault["path"]}")
+
 
 FUNCTIONS = [
     # Vault Functions
@@ -91,11 +90,12 @@ for func in FUNCTIONS:
     cmd_name, help_text, func_ref = func
     subparser = subparsers.add_parser(cmd_name, help=help_text)
     
-    # Define arguments for each command if needed
     # if cmd_name == "addfolder":
     #     subparser.add_argument('path', type=str, help='Path to the folder to add as vault')
     # elif cmd_name == "selectvault":
     #     subparser.add_argument('id', type=int, help='ID of the vault to select')
+
+    # db: database to perform action on
 
     # Associate the function with the subparser
     subparser.set_defaults(func=func_ref)
