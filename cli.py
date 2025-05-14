@@ -1,14 +1,17 @@
-from argparse import ArgumentParser
-import controller
+import argparse
+import logging
+from controller import xenolyte
 from _version import __version__
+from datetime import datetime
 
 
-def list_vaults():
+
+def list_vaults(args=False):
     """
     Retrieves and displays a list of vaults with their paths and modification times.
     """
     try:
-        vaults: List[Dict[str, str]] = controller.xenolyte.return_all_vaults()
+        vaults: List[Dict[str, str]] = xenolyte.return_all_vaults()
     except Exception as e:
         print(f"Error retrieving vaults: {e}")
         return
@@ -18,7 +21,7 @@ def list_vaults():
         return
 
     table_data = []
-    for index, vault in enumerate(vaults, start=1):
+    for index, vault in enumerate(vaults, start=0):
         path = vault.get('path', 'N/A')
         modified_raw = vault.get('modified', '')
         try:
@@ -44,44 +47,61 @@ def list_vaults():
         print(row_format.format(*row))
 
 
-def add_folder():
+def add_folder(args=False):
     path = input("Enter existing folder path: ")
-    controller.xenolyte.append_vault(path)
+    xenolyte.append_vault(path)
     list_vaults()
 
+def select_vault(args=False):
+    print("Type in the number of the vault you want to select.")
+    list_vaults()
+    select_vault = input("Select Vault: ")
+    try:
+        select_vault_path = xenolyte.return_all_vaults()[select_vault]
+    except:
+        print("Please select an existing Vault.")
+    if xenolyte.set_vault_modified_now(select_vault_path):
+        print(f"Selected Vault {select_vault_path}")
+    else:
+        print("Error selecting Vault")
+
+def show_selected_vault(args=False):
+    active_vault = xenolyte.return_recent_vault()
+    print(f"{active_vault["path"]}")
 
 FUNCTIONS = [
     # Vault Functions
     ["listvaults", "List all currently selected vaults", list_vaults],
     ["addfolder", "Add an existing folder as vault, [path]", add_folder],
-    ["selectvault", "Select a vault from List of Vaults, [id]"],
-    ["showselectedvault", "Display currently selected vault"],
+    ["selectvault", "Select a vault from List of Vaults, [id]", select_vault],
+    ["showselectedvault", "Display currently selected vault",show_selected_vault],
 
     # Database functions
-    ["createtable", ""],
-    ["createdatabase", ""],
-    ["createrecordfolder", ""],
-    ["createrecord", ""],
+    # ["createtable", ""],
+    # ["createdatabase", ""],
+    # ["createrecordfolder", ""],
+    # ["createrecord", ""],
 
 ]
 
-parser = ArgumentParser(prog='cli')
-parser.add_argument('database', help="Postional Argument, which database should it be?", default=False)
-parser.add_argument('command', help="Postional Argument, command to do with database.", nargs='?')
-parser.add_argument('-id',action='store',dest="id", help="Id of record.") 
-parser.add_argument('-v', '--version',action='version',version=__version__) 
+parser = argparse.ArgumentParser(prog='cli', description='Xenolyte Vault Management CLI')
+subparsers = parser.add_subparsers(title='Commands', dest='command', required=True)
+
+for func in FUNCTIONS:
+    cmd_name, help_text, func_ref = func
+    subparser = subparsers.add_parser(cmd_name, help=help_text)
+    
+    # Define arguments for each command if needed
+    # if cmd_name == "addfolder":
+    #     subparser.add_argument('path', type=str, help='Path to the folder to add as vault')
+    # elif cmd_name == "selectvault":
+    #     subparser.add_argument('id', type=int, help='ID of the vault to select')
+
+    # Associate the function with the subparser
+    subparser.set_defaults(func=func_ref)
 
 args = parser.parse_args()
 
-# for database in utils.get_databases():
-#     db_name = utils.get_last_folder(database["path"])
-#     # print(database)
-#     if args.database == db_name:
-#         # print(db_name)
-#         func = FUNCTIONS.get(args.command)
-#         if func:
-#             func(database["path"],args)
-#         else:
-#             print(f"No such function: {args.command}")
-
+# Call the associated function with parsed arguments
+args.func(args=args)
 

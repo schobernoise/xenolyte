@@ -4,11 +4,11 @@ import json
 
 
 CONFIG_TEMPLATE = {
-    columns: [
+    "columns": [
         {
-            name: "id",
-            _type: "int",
-            width: 20
+            "name": "id",
+            "_type": "int",
+            "width": 20
         }
     ]
 }
@@ -57,15 +57,12 @@ def get_config_json(path):
 def update_config_json(path, updated_config):
     config_path = os.path.join(path,"config.json")
     try:
-        # Serialize the updated_config to JSON
         config_json = json.dumps(updated_config, indent=4)
 
-        # Create a temporary file in the same directory
         with tempfile.NamedTemporaryFile('w', delete=False, dir=config_path.parent, encoding='utf-8') as tmp_file:
             tmp_file.write(config_json)
             temp_path = Path(tmp_file.name)
 
-        # Replace the original config with the temporary file
         config_path.replace(temp_path)
 
         print(f"{config_path} has been atomically updated.")

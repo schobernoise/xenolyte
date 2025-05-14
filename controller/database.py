@@ -48,8 +48,8 @@ def create_record_folder(path, id):
 
 def load_table(path):
     return {
-        _type: "table",
-        table: utils.fetch_table(path)
+        "_type": "table",
+        "table": utils.fetch_table(path)
     }
 
 
@@ -59,9 +59,9 @@ def load_database(path):
     table = utils.fetch_table(table_path)
     config = utils.get_config_json(path)
     return {
-        _type: "database",
-        table: table,
-        config: config
+        "_type": "database",
+        "table": table,
+        "config": config
     }
 
 
