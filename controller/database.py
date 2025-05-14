@@ -1,4 +1,5 @@
-import model, utils
+from controller import utils
+import model
 import os
 import logging
 from datetime import date
