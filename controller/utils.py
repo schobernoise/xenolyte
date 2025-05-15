@@ -4,6 +4,7 @@ import json
 
 
 CONFIG_TEMPLATE = {
+    "id": "generate_id",
     "columns": [
         {
             "name": "id",

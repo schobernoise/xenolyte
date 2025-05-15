@@ -6,8 +6,10 @@ from datetime import datetime
 VAULTS = "data/vaults.csv"
 
 XENOLYTE_CONFIG_TEMPLATE = {
+    "id": "generate_id",
     "theme": "default",
-    "default_column_width": 20
+    "default_column_width": 20,
+    "backup_path": ""
 }
 
 def return_recent_vault():
@@ -20,6 +22,14 @@ def return_recent_vault():
 def return_all_vaults():
     """Reads vaults.csv and returns a list of all vaults."""
     return model.records.read_records(VAULTS)
+
+
+def get_vault_from_name(name):
+    vaults = model.records.read_records(VAULTS)
+    for vault in vaults:
+        if name in vault["path"]:
+            return vault
+    return False
 
 
 def append_vault(path):

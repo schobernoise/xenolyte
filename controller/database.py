@@ -7,6 +7,45 @@ import shutil
 
 today = date.today()
 
+
+def get_all_tables(path):
+    try:
+        items = os.listdir(path)
+    except Exception as e:
+        print(f"Error reading directory {path}: {e}")
+        return objects
+
+    for item in items:
+        item_path = os.path.join(path, item)
+        if os.path.isfile(item_path) and item.lower().endswith('.csv'):
+            obj = {
+                "_type": "table",
+                "name": utils.get_folder_name(item_path.replace(".csv","")),
+                "records": utils.fetch_table(item_path)
+            }
+            objects.append(obj)
+        elif os.path.isdir(item_path):
+            table_path = os.path.join(item_path, f"{item}.csv")
+            if os.path.isfile(table_path):
+                obj = {
+                    "_type": "database",
+                    "name": utils.get_folder_name(table_path.replace(".csv","")),
+                    "records": utils.fetch_table(table_path),
+                    "config": utils.get_config_json(item_path)
+                }
+                objects.append(obj)
+    return objects
+
+
+
+def get_table_from_name(path, name):
+    tables = get_all_tables(path)
+    for table in tables:
+        if table["name"] == name:
+            return table
+    return False
+
+
 def create_new_table(path,name):
     new_table_path = os.path.join(path,f"{name}.csv")
     utils.create_empty_table(new_table_path)
@@ -50,7 +89,8 @@ def create_record_folder(path, id):
 def load_table(path):
     return {
         "_type": "table",
-        "table": utils.fetch_table(path)
+        "name": utils.get_folder_name(path.replace(".csv","")),
+        "records": utils.fetch_table(path)
     }
 
 
@@ -61,17 +101,27 @@ def load_database(path):
     config = utils.get_config_json(path)
     return {
         "_type": "database",
-        "table": table,
+        "name": database_name,
+        "records": table,
         "config": config
     }
 
 
 def get_record(path, id):
+    # ! DEPRECATED: will be removed in next commit
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
     table = utils.fetch_table(table_path)
     logging.info(f"database: Returning Record with Id {id}")
     return utils.fetch_record(table,id)
+
+
+
+def get_record_from_table(table, id):
+    for record in table["records"]:
+        if record["id"] == id:
+            return record
+    return False
 
 
 def create_record(path, record,id=False):
@@ -104,6 +154,5 @@ def update_record(path,updated_record):
 
 def create_functions_py():
     pass
-
 
 

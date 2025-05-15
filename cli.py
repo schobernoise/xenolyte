@@ -51,6 +51,7 @@ def add_folder(args=False):
     xenolyte.append_vault(path)
     list_vaults()
 
+
 def select_vault(args=False):
     print("Type in the number of the vault you want to select.")
     list_vaults()
@@ -62,11 +63,34 @@ def select_vault(args=False):
     else:
         print("Error selecting Vault")
 
+
 def show_selected_vault(args=False):
     active_vault = xenolyte.return_recent_vault()
     print(f"{active_vault["path"]}")
 
 
+def show_vault_config(args):
+    pass
+
+
+def backup_vault(args):
+    pass
+
+
+def list_tables(args):
+     pass   
+
+
+def show_table_config(args):
+    pass
+
+
+def backup_table(args):
+    pass
+
+
+def delete_table(args):
+    pass
 
 
 def show_record(args):
@@ -74,16 +98,9 @@ def show_record(args):
     Show a specific record by id in a specific table.
     """
     table_name = args.table
+    table = database.get_table_from_name(table_name)
     record_id = args.record_id
-
-    # try:
-    #     record = xenolyte.get_record(table_name, record_id)
-    #     if record:
-    #         print(f"Record {record_id} in table {table_name}: {record}")
-    #     else:
-    #         print(f"Record {record_id} not found in table {table_name}.")
-    # except Exception as e:
-    #     print(f"Error retrieving record: {e}")
+    record = database.get_record_from_table(table, record_id)
 
 
 def list_records(args):
@@ -91,16 +108,10 @@ def list_records(args):
     List all records in a specific table.
     """
     table_name = args.table
-    # try:
-    #     records = xenolyte.list_records(table_name)
-    #     if records:
-    #         print(f"Records in table {table_name}:")
-    #         for record in records:
-    #             print(record)
-    #     else:
-    #         print(f"No records found in table {table_name}.")
-    # except Exception as e:
-    #     print(f"Error listing records: {e}")
+    table = database.get_table_from_name(table_name)
+    for record in table["records"]:
+        print(record)
+
 
 
 VAULT_COMMANDS = [
