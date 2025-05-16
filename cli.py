@@ -1,6 +1,6 @@
 import argparse
 import logging
-from controller import xenolyte,database
+from controller import xenolyte,database,utils
 from _version import __version__
 from datetime import datetime
 
@@ -70,7 +70,7 @@ def show_selected_vault(args=False):
 
 
 def show_vault_config(args):
-    pass
+    print(xenolyte.read_xenolyte_json(xenolyte.return_recent_vault()["path"]))
 
 
 def backup_vault(args):
@@ -78,12 +78,21 @@ def backup_vault(args):
 
 
 def list_tables(args):
-     pass   
+     active_vault = xenolyte.return_recent_vault()
+     for table in database.get_all_tables(active_vault["path"]):
+        print(table["name"]) 
 
 
 def show_table_config(args):
+    print(utils.get_config_json(database.get_table_from_name(args.table)))
+
+
+def show_table_readme(args):
     pass
 
+
+def show_vault_readme(args):
+    pass
 
 def backup_table(args):
     pass
@@ -141,14 +150,14 @@ VAULT_COMMANDS = [
     }
 ]
 
-# Define database functions
-# listtables
-# deletetable
-# createtable
-# showreadme for table
-# showreadme for record (combine?)
 
 DATABASE_COMMANDS = [
+    {
+        "name": "listtables",
+        "help": "List all records in a table",
+        "func": list_tables,
+        "arguments": []
+    },
     {
         "name": "listrecords",
         "help": "List all records in a table",
@@ -181,6 +190,8 @@ DATABASE_COMMANDS = [
 ]
 
 parser = argparse.ArgumentParser(prog='cli', description='Xenolyte Vault Management CLI')
+parser.add_argument('-v', '--verbose', action='count', default=0, help='Increase verbosity (use -vvv for debug)')
+
 subparsers = parser.add_subparsers(title='Commands', dest='command', required=True)
 
 vault_parser = subparsers.add_parser('vault', help='Vault management commands')
@@ -202,4 +213,16 @@ for cmd in DATABASE_COMMANDS:
     subparser.set_defaults(func=cmd["func"])
 
 args = parser.parse_args()
+
+if args.verbose >= 3:
+    loglevel = logging.DEBUG
+elif args.verbose == 2:
+    loglevel = logging.INFO
+elif args.verbose == 1:
+    loglevel = logging.WARNING
+else:
+    loglevel = logging.ERROR
+
+logging.basicConfig(level=loglevel, format='%(levelname)s: %(message)s')
+
 args.func(args=args)

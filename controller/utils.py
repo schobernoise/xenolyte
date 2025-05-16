@@ -1,6 +1,7 @@
 from model import records
 import os
 import json
+import logging
 
 
 CONFIG_TEMPLATE = {
@@ -16,6 +17,7 @@ CONFIG_TEMPLATE = {
 
 
 def get_folder_name(path):
+    logging.debug("utils: Get Folder Name")
     return os.path.split(os.path.normpath(path))
 
 
@@ -52,7 +54,22 @@ def create_config_json(path):
 
 
 def get_config_json(path):
-    return json.load(os.path.join(path,"config.json"))
+    logging.debug("utils: Get Config Json")
+    logging.debug("utils: path",path)
+    config_path = os.path.join(path,"config.json")
+    logging.debug("utils: Config Path", config_path)
+
+    if os.path.isfile(config_path) and config_path.lower().endswith('.json'):
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+            logging.debug("utils: Config existing", config)
+            return config
+    else:
+        logging.debug("utils: Config missing, creating")
+        new_config_path = create_config_json(path)
+        with open(new_config_path, 'r') as f:
+            return json.load(f)
+
 
 
 def update_config_json(path, updated_config):
@@ -100,7 +117,7 @@ def read_markdown(path):
 
 
 def fetch_table(path):
-    return records.read_records(table_path)
+    return records.read_records(path)
 
 
 def fetch_record(table,id):

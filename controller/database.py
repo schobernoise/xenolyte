@@ -9,14 +9,17 @@ today = date.today()
 
 
 def get_all_tables(path):
+    logging.debug("database: Get all Tables")
+    objects=[]
     try:
         items = os.listdir(path)
     except Exception as e:
-        print(f"Error reading directory {path}: {e}")
+        logging.error(f"Error reading directory {path}: {e}")
         return objects
 
     for item in items:
         item_path = os.path.join(path, item)
+        logging.debug("database",item_path)
         if os.path.isfile(item_path) and item.lower().endswith('.csv'):
             obj = {
                 "_type": "table",
@@ -26,6 +29,7 @@ def get_all_tables(path):
             objects.append(obj)
         elif os.path.isdir(item_path):
             table_path = os.path.join(item_path, f"{item}.csv")
+            # print(table_path)
             if os.path.isfile(table_path):
                 obj = {
                     "_type": "database",
@@ -39,6 +43,7 @@ def get_all_tables(path):
 
 
 def get_table_from_name(path, name):
+    logging.debug("database: Get Table from Name")
     tables = get_all_tables(path)
     for table in tables:
         if table["name"] == name:
@@ -53,6 +58,7 @@ def create_new_table(path,name):
 
 
 def create_new_database(path,name,args=False):
+    logging.debug("database: Create New Database")
     new_database_path = os.path.join(path,f"{name}")
     utils.create_empty_folder(new_database_path)
     utils.create_config_json(path)
@@ -65,6 +71,7 @@ def create_new_database(path,name,args=False):
     
 
 def create_database_from_table(path, create_record_folders=False):
+    logging.debug("database: Create Database from Table")
     database_path = utils.create_empty_folder(path.replace(".csv",""))
     shutil.move(path, database_path)
     utils.create_config_json(database_path)
@@ -82,11 +89,13 @@ def create_database_from_table(path, create_record_folders=False):
 
 
 def create_record_folder(path, id):
+    logging.debug("database: create Record Folder")
     record = get_record(path,id)
     return utils.create_record_folder(path,record)
 
 
 def load_table(path):
+    logging.debug("database: Load Table")
     return {
         "_type": "table",
         "name": utils.get_folder_name(path.replace(".csv","")),
@@ -95,6 +104,7 @@ def load_table(path):
 
 
 def load_database(path):
+    logging.debug("database: Load Database")
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
     table = utils.fetch_table(table_path)
@@ -109,6 +119,7 @@ def load_database(path):
 
 def get_record(path, id):
     # ! DEPRECATED: will be removed in next commit
+    logging.debug("database: Get Record - Deprecated")
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
     table = utils.fetch_table(table_path)
@@ -118,6 +129,8 @@ def get_record(path, id):
 
 
 def get_record_from_table(table, id):
+    logging.debug("database: Get Record from Table")
+    logging.debug("database",table,id)
     for record in table["records"]:
         if record["id"] == id:
             return record
@@ -125,6 +138,8 @@ def get_record_from_table(table, id):
 
 
 def create_record(path, record,id=False):
+    logging.debug("database: Create Record")
+    logging.debug("database",path,record,id)
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
     model.records.create_record(table_path,record)
@@ -133,6 +148,8 @@ def create_record(path, record,id=False):
 
 
 def delete_record(path,id):
+    logging.debug("database: Delete Record")
+    logging.debug("database: path,id")
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
     table = utils.fetch_table(table_path)
@@ -149,6 +166,7 @@ def update_record(path,updated_record):
     updated_table = utils.replace_record_in_table(table,updated_record)
     model.records.overwrite_records(table_path,updated_table)
     logging.info(f"database: Create Record with Id {updated_record['id']}")
+    logging.debug(f"database: {updated_record}")
     return updated_record
 
 
@@ -156,3 +174,5 @@ def create_functions_py():
     pass
 
 
+def delete_table(path):
+    pass

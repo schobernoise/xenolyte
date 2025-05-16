@@ -4,6 +4,7 @@ import logging
 
 def read_records(file):
     """Return all records."""
+    # print(file)
     with open(file, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f, delimiter=";")
         logging.info("Reading Records.")
