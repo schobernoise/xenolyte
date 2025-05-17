@@ -94,11 +94,17 @@ def show_table_readme(args):
 def show_vault_readme(args):
     pass
 
+
 def backup_table(args):
     pass
 
 
 def delete_table(args):
+    # Confirm before delete
+    pass
+
+
+def create_record(args):
     pass
 
 
@@ -107,20 +113,31 @@ def show_record(args):
     Show a specific record by id in a specific table.
     """
     table_name = args.table
-    table = database.get_table_from_name(table_name)
+    active_vault = xenolyte.return_recent_vault()
+    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
     record_id = args.record_id
     record = database.get_record_from_table(table, record_id)
+    print(record)
 
 
 def list_records(args):
     """
     List all records in a specific table.
     """
+    logging.debug(f"cli: {args}")
+    active_vault = xenolyte.return_recent_vault()
     table_name = args.table
-    table = database.get_table_from_name(table_name)
+    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
     for record in table["records"]:
         print(record)
 
+
+def show_cell(args):
+    pass
+
+
+def set_cell(args):
+    pass
 
 
 VAULT_COMMANDS = [

@@ -19,11 +19,11 @@ def get_all_tables(path):
 
     for item in items:
         item_path = os.path.join(path, item)
-        logging.debug("database",item_path)
+        logging.debug("database: %s", item_path)
         if os.path.isfile(item_path) and item.lower().endswith('.csv'):
             obj = {
                 "_type": "table",
-                "name": utils.get_folder_name(item_path.replace(".csv","")),
+                "name": utils.get_folder_name(item_path.replace(".csv",""))[1],
                 "records": utils.fetch_table(item_path)
             }
             objects.append(obj)
@@ -33,7 +33,7 @@ def get_all_tables(path):
             if os.path.isfile(table_path):
                 obj = {
                     "_type": "database",
-                    "name": utils.get_folder_name(table_path.replace(".csv","")),
+                    "name": utils.get_folder_name(table_path.replace(".csv",""))[1],
                     "records": utils.fetch_table(table_path),
                     "config": utils.get_config_json(item_path)
                 }
@@ -52,6 +52,7 @@ def get_table_from_name(path, name):
 
 
 def create_new_table(path,name):
+    logging.debug("database: Create New Table")
     new_table_path = os.path.join(path,f"{name}.csv")
     utils.create_empty_table(new_table_path)
     logging.info("database: created new table")
@@ -98,14 +99,14 @@ def load_table(path):
     logging.debug("database: Load Table")
     return {
         "_type": "table",
-        "name": utils.get_folder_name(path.replace(".csv","")),
+        "name": utils.get_folder_name(path.replace(".csv",""))[1],
         "records": utils.fetch_table(path)
     }
 
 
 def load_database(path):
     logging.debug("database: Load Database")
-    database_name = utils.get_folder_name(path)
+    database_name = utils.get_folder_name(path)[1]
     table_path = os.path.join(path, f"{database_name}.csv")
     table = utils.fetch_table(table_path)
     config = utils.get_config_json(path)
@@ -118,7 +119,7 @@ def load_database(path):
 
 
 def get_record(path, id):
-    # ! DEPRECATED: will be removed in next commit
+    # ! DEPRECATED: will be removed
     logging.debug("database: Get Record - Deprecated")
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
@@ -130,7 +131,8 @@ def get_record(path, id):
 
 def get_record_from_table(table, id):
     logging.debug("database: Get Record from Table")
-    logging.debug("database",table,id)
+    logging.debug("database: %s", table)
+    logging.debug("database: %s", id)
     for record in table["records"]:
         if record["id"] == id:
             return record

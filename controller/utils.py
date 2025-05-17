@@ -55,14 +55,14 @@ def create_config_json(path):
 
 def get_config_json(path):
     logging.debug("utils: Get Config Json")
-    logging.debug("utils: path",path)
+    logging.debug("utils: %s", path)
     config_path = os.path.join(path,"config.json")
-    logging.debug("utils: Config Path", config_path)
+    logging.debug("utils: Config Path %s", config_path)
 
     if os.path.isfile(config_path) and config_path.lower().endswith('.json'):
         with open(config_path, 'r') as f:
             config = json.load(f)
-            logging.debug("utils: Config existing", config)
+            logging.debug("utils: Config existing %s", config)
             return config
     else:
         logging.debug("utils: Config missing, creating")
@@ -112,8 +112,26 @@ def get_record_folder(path,record):
     return f"{record['id']} {record['slug']}".strip().replace("/", "-")
 
 
-def read_markdown(path):
-    pass
+
+def read_markdown(file_path):
+    """
+    Reads a Markdown file and returns its content as a string.
+    """
+    try:
+        logging.debug("Attempting to read the Markdown file: %s", file_path)
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        logging.info("Successfully read the file: %s", file_path)
+        return content
+    except FileNotFoundError:
+        logging.error("The file '%s' does not exist.", file_path)
+        raise
+    except IOError as e:
+        logging.error("An I/O error occurred while reading '%s': %s", file_path, e)
+        raise
+    except UnicodeDecodeError as e:
+        logging.error("Encoding error while reading '%s': %s", file_path, e)
+        raise
 
 
 def fetch_table(path):
