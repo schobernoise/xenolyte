@@ -14,6 +14,7 @@ XENOLYTE_CONFIG_TEMPLATE = {
 
 def return_recent_vault():
     """Checks vaults.csv and returns most recent (active) vault. If empty, return False."""
+    logging.info("xenolyte: Return recent vault")
     vaults = model.records.read_records(VAULTS)
     if vaults:
         return max(vaults, key=lambda obj: obj["modified"])
@@ -21,6 +22,7 @@ def return_recent_vault():
 
 def return_all_vaults():
     """Reads vaults.csv and returns a list of all vaults."""
+    logging.info("xenolyte: Return all  vaults")
     return model.records.read_records(VAULTS)
 
 
@@ -143,8 +145,7 @@ def create_xenolyte_json(path: str, overwrite: bool = False, backup: bool = Fals
     except Exception as e:
         logging.error(f"Failed to create xenolyte.json in {path}: {e}")
         return None
-
-
+        
 
 def read_xenolyte_json(path):
     return json.load(os.path.join(path,"xenolyte.json"))
