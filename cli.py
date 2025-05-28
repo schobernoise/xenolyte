@@ -129,8 +129,14 @@ def delete_table(args):
 def create_record(args):
     logging.debug(f"cli: {args}")
     # TODO args.table - read headers - iterate through them
-    # Get Types form config.json, show near input
-    pass
+    # TODO Get Types form config.json, show near input
+    table_name = args.table
+    active_vault = xenolyte.return_recent_vault()
+    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
+    new_record = utils.create_wizard(table.records[0].keys())
+    database.create_record_in_table(table_name,new_record,id=int(table.records[:1]["id"])+1)
+
+    
 
 
 def update_record(args):

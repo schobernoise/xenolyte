@@ -41,7 +41,6 @@ def get_all_tables(path):
     return objects
 
 
-
 def get_table_from_name(path, name):
     """Returns a tuple of the path and the foldername."""
     logging.info("database: Get Table from Name")
@@ -135,7 +134,6 @@ def get_record(path, id):
     return utils.fetch_record(table,id)
 
 
-
 def get_record_from_table(table, id):
     """Returns the record of a table object."""
     logging.info("database: Get Record from Table")
@@ -148,6 +146,7 @@ def get_record_from_table(table, id):
 
 
 def create_record(path, record,id=False):
+    # ! DEPRECATED: will be removed in future commits
     """Creates a record."""
     logging.info("database: Create Record")
     logging.debug("database: %s", path)
@@ -155,6 +154,18 @@ def create_record(path, record,id=False):
     logging.debug("database: %s", id)
     database_name = utils.get_folder_name(path)
     table_path = os.path.join(path, f"{database_name}.csv")
+    model.records.create_record(table_path,record)
+    logging.info(f"database: Create Record with Id {record['id']}")
+    return record
+
+
+def create_record_in_table(table, record,id=False):
+    """Creates a record."""
+    logging.info("database: Create Record")
+    logging.debug("database: %s", table)
+    logging.debug("database: %s", record)
+    logging.debug("database: %s", id)
+    table_path = os.path.join(path, f"{table}.csv")
     model.records.create_record(table_path,record)
     logging.info(f"database: Create Record with Id {record['id']}")
     return record

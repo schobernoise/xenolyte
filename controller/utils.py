@@ -71,7 +71,6 @@ def get_config_json(path):
             return json.load(f)
 
 
-
 def update_config_json(path, updated_config):
     config_path = os.path.join(path,"config.json")
     try:
@@ -110,7 +109,6 @@ def create_record_folder(path, record):
 
 def get_record_folder(path,record):
     return f"{record['id']} {record['slug']}".strip().replace("/", "-")
-
 
 
 def read_markdown(file_path):
@@ -153,7 +151,6 @@ def replace_record_in_table(table,updated_record):
     else:
         updated_table.append(updated_record)
     return updated_table
-
 
 
 def remove_record_by_id(table, id_to_remove):
@@ -210,3 +207,14 @@ def dicts_to_table(dicts):
         table = table.rstrip(' | ') + '\n'
 
     return table
+
+
+def create_wizard(keys):
+    print("##### CREATE WIZARD #####")
+    new_record = {}
+    for key in keys:
+        if 'id' in key.lower():
+            continue
+        value = input(f"Enter value for '{key}': ")
+        new_record[key] = value
+    return new_record
