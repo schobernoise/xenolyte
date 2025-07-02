@@ -141,13 +141,20 @@ def create_record(args):
 
 def update_record(args):
     logging.debug(f"cli: {args}")
+    table_name = args.table
+    record_id = args.record_id
+    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
+    record = database.get_record_from_table(table, record_id)
     # TODO args.table, args.id - get record - iterate through it
     # TODO Make modified copy - overwrite old record
 
 
 def delete_record(args):
     logging.debug(f"cli: {args}")
-    # TODO args.table, args.id - delete id from table
+    table_name = args.table
+    record_id = args.record_id
+    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
+    database.delete_record
     pass
 
 

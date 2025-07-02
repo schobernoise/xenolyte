@@ -105,7 +105,8 @@ def load_table(path):
     return {
         "_type": "table",
         "name": utils.get_folder_name(path.replace(".csv",""))[1],
-        "records": utils.fetch_table(path)
+        "records": utils.fetch_table(path),
+        "path": path
     }
 
 
@@ -120,7 +121,8 @@ def load_database(path):
         "_type": "database",
         "name": database_name,
         "records": table,
-        "config": config
+        "config": config,
+        "path": path
     }
 
 
@@ -172,6 +174,21 @@ def create_record_in_table(table, record,id=False):
 
 
 def delete_record(path,id):
+    # ! DEPRECATED: will be removed in future commits
+    """Deletes the record."""
+    logging.info("database: Delete Record")
+    logging.debug("database: %s", path)
+    logging.debug("database: %s", id)
+    database_name = utils.get_folder_name(path)
+    table_path = os.path.join(path, f"{database_name}.csv")
+    table = utils.fetch_table(table_path)
+    updated_table = utils.remove_record_by_id(table,id)
+    model.records.overwrite_records(table_path,updated_table)
+    logging.info(f"database: Delete Record with Id {id}")
+    return id
+
+
+def delete_record_from_table(table,id):
     """Deletes the record."""
     logging.info("database: Delete Record")
     logging.debug("database: %s", path)
