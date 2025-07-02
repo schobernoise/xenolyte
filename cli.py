@@ -9,6 +9,12 @@ from datetime import datetime
 # Logging,
 
 
+class CLI():
+
+    def __init__():
+        pass
+
+
 # def backup_vault(args):
     # Get backup location from config
     # Overwrite 
