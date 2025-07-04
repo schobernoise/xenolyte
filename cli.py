@@ -4,10 +4,6 @@ from controller import xenolyte,database,utils
 from _version import __version__
 from datetime import datetime
 
-# TODO Create CLI Class with parent cli-method
-# All cli methods derive from it
-# Logging,
-
 
 # def backup_vault(args):
     # Get backup location from config
