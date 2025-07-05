@@ -1,181 +1,153 @@
 import argparse
+import os
 import logging
-from controller import xenolyte,database,utils
+from xenolyte import Xenolyte
 from _version import __version__
 from datetime import datetime
+import utils
+
+
+def initialize_xenolyte(args):
+    print("Welcome to XENOLYTE.")
+    if not os.path.exists("./data/xenolyte.json"):
+        first_vault_path = input("Please provide your first Vault path: ")
+        _xeno = Xenolyte(first_vault_path=first_vault_path)
+
+
+def list_vaults(args):
+    _xeno = Xenolyte()
+    vaults = _xeno.fetch_all_vaults()
+    for vault in vaults:
+        print(vault)
+
+
+def add_existing_folder(args):
+    _xeno = Xenolyte()
+    logging.debug(f"{args}")
+    path = input("Enter existing folder path: ")
+    _xeno.add_exisiting_vault(path)
+    list_vaults()
+
+
+def select_vault(args):
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    print("Type in the number of the vault you want to select.")
+    list_vaults()
+    vaults = _xeno.fetch_all_vaults()
+    select_vault = input("Select Vault: ")
+    vaults[select_vault].set_vault_modified_now()
+
+
+def show_selected_vault(args):
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    active_vault = _xeno.fetch_recent_vault()
+    print(active_vault)
+
+
+def show_vault_config(args):
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    active_vault = _xeno.fetch_recent_vault()
+    print(active_vault.fetch_vault_config())
+
+
+def list_tables(args):
+    _xeno = Xenolyte()
+    logging.debug(f"{args}")
+    active_vault = _xeno.return_recent_vault()
+    for container in active_vault.containers:
+        print(container) 
+
+
+def delete_table(args):
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    active_vault = _xeno.return_recent_vault()
+    active_vault.delete_container(args.table)
+    # TODO Confirm before delete - show data sample
+
+
+def create_record(args):
+    # TODO Get Types form config.json, show near input
+    _xeno = Xenolyte()
+    logging.debug(f"{args}")
+    active_vault = _xeno.return_recent_vault()
+    table = active_vault.get_container_from_name(args.table)
+    new_record = utils.create_wizard(table.fieldnames)
+    table.create_record(new_record)
+    
+
+def update_record(args):
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    active_vault = _xeno.return_recent_vault()
+    table = active_vault.get_container_from_name(args.table)
+    record = table.fetch_record(args.record_id)
+    updated_record = utils.update_wizard(record)
+    table.update_record(updated_record)
+
+
+def delete_record(args):
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    table = active_vault.get_container_from_name(args.table)
+    database.delete_record()
+
+
+def show_record(args):
+    _xeno = Xenolyte()
+    logging.debug(f"{args}")
+    active_vault = _xeno.return_recent_vault()
+    table = active_vault.get_container_from_name(args.table)
+    record = table.fetch_record(args.record_id)
+    print(utils.object_to_table(record))
+
+
+def list_records(args):
+    _xeno = Xenolyte()
+    logging.debug(f"{args}")
+    active_vault = _xeno.return_recent_vault()
+    table = active_vault.get_container_from_name(args.table)
+    print(utils.dicts_to_table(table.records))
+
+
+def show_vault_readme(args):
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    active_vault = _xeno.return_recent_vault()
+    print(active_vault.fetch_vault_config())
+
+
+# def show_database_config(args):
+#     _xeno = Xenolyte()
+#     active_vault = _xeno.return_recent_vault()
+#     active_vault.get_container_from_name(args.table)
+#     logging.debug(f"{args}")
+#     print(_xeno)
+
+
+# def show_database_readme(args):
+#     _xeno = Xenolyte()
+#     logging.debug(f"{args}")
+#     pass
 
 
 # def backup_vault(args):
     # Get backup location from config
     # Overwrite 
     # ? Comes with Version 2.0
-#     logging.debug(f"cli: {args}")
+#     logging.debug(f"{args}")
 #     pass
+
 
 # def backup_table(args):
     # Get backup location from config
     # Overwrite 
     # ? Comes with Version 2.0
-#     logging.debug(f"cli: {args}")
+#     logging.debug(f"{args}")
 #     pass
-
-
-def list_vaults(args=False):
-    """
-    Retrieves and displays a list of vaults with their paths and modification times.
-    """
-    logging.debug(f"cli: {args}")
-    try:
-        vaults: List[Dict[str, str]] = xenolyte.return_all_vaults()
-    except Exception as e:
-        print(f"Error retrieving vaults: {e}")
-        return
-
-    if not vaults:
-        print("No vaults available.")
-        return
-
-    table_data = []
-    for index, vault in enumerate(vaults, start=0):
-        path = vault.get('path', 'N/A')
-        modified_raw = vault.get('modified', '')
-        try:
-            modified_dt = datetime.fromisoformat(modified_raw)
-            modified = modified_dt.strftime('%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            modified = modified_raw  
-
-        table_data.append([index, path, modified])
-
-    headers = ["#", "Path", "Modified"]
-
-    col_widths = [max(len(str(row[i])) for row in table_data + [headers]) for i in range(3)]
-
-    row_format = ("| {:<" + str(col_widths[0]) + "} "
-                    "| {:<" + str(col_widths[1]) + "} "
-                    "| {:<" + str(col_widths[2]) + "} |")
-
-    print(row_format.format(*headers))
-    print("-" * (sum(col_widths) + 10))  
-
-    for row in table_data:
-        print(row_format.format(*row))
-
-
-def add_folder(args):
-    logging.debug(f"cli: {args}")
-    path = input("Enter existing folder path: ")
-    xenolyte.append_vault(path)
-    list_vaults()
-
-
-def select_vault(args):
-    logging.debug(f"cli: {args}")
-    print("Type in the number of the vault you want to select.")
-    list_vaults()
-    select_vault = input("Select Vault: ")
-    select_vault_path = xenolyte.return_all_vaults()[int(select_vault)]["path"]
-    # TODO: Error handling for user input
-    if xenolyte.set_vault_modified_now(select_vault_path):
-        print(f"Selected Vault {select_vault_path}")
-    else:
-        print("Error selecting Vault")
-
-
-def show_selected_vault(args):
-    logging.debug(f"cli: {args}")
-    active_vault = xenolyte.return_recent_vault()
-    print(f"{active_vault["path"]}")
-
-
-def show_vault_config(args):
-    logging.debug(f"cli: {args}")
-    print(xenolyte.read_xenolyte_json(xenolyte.return_recent_vault()["path"]))
-
-
-def list_tables(args):
-    logging.debug(f"cli: {args}")
-    active_vault = xenolyte.return_recent_vault()
-    for table in database.get_all_tables(active_vault["path"]):
-        print(table["name"]) 
-
-
-def show_table_config(args):
-    logging.debug(f"cli: {args}")
-    print(utils.get_config_json(database.get_table_from_name(args.table)))
-
-
-def show_table_readme(args):
-    logging.debug(f"cli: {args}")
-    pass
-
-
-def show_vault_readme(args):
-    logging.debug(f"cli: {args}")
-    pass
-
-
-def delete_table(args):
-    logging.debug(f"cli: {args}")
-    # TODO args.table - delete table
-    # TODO Confirm before delete - show data sample
-    pass
-
-
-def create_record(args):
-    logging.debug(f"cli: {args}")
-    # TODO args.table - read headers - iterate through them
-    # TODO Get Types form config.json, show near input
-    table_name = args.table
-    active_vault = xenolyte.return_recent_vault()
-    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
-    new_record = utils.create_wizard(table.records[0].keys())
-    database.create_record_in_table(table_name,new_record,id=int(table.records[:1]["id"])+1)
-
-    
-
-
-def update_record(args):
-    logging.debug(f"cli: {args}")
-    table_name = args.table
-    record_id = args.record_id
-    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
-    record = database.get_record_from_table(table, record_id)
-    # TODO args.table, args.id - get record - iterate through it
-    # TODO Make modified copy - overwrite old record
-
-
-def delete_record(args):
-    logging.debug(f"cli: {args}")
-    table_name = args.table
-    record_id = args.record_id
-    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
-    database.delete_record
-    pass
-
-
-def show_record(args):
-    """
-    Show a specific record by id in a specific table.
-    """
-    logging.debug(f"cli: {args}")
-    table_name = args.table
-    active_vault = xenolyte.return_recent_vault()
-    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
-    record_id = args.record_id
-    record = database.get_record_from_table(table, record_id)
-    print(utils.object_to_table(record))
-
-
-def list_records(args):
-    """
-    List all records in a specific table.
-    """
-    logging.debug(f"cli: {args}")
-    active_vault = xenolyte.return_recent_vault()
-    table_name = args.table
-    table = database.get_table_from_name(path=active_vault["path"],name=table_name)
-    print(utils.dicts_to_table(table["records"]))
 
 
 VAULT_COMMANDS = [
@@ -188,7 +160,7 @@ VAULT_COMMANDS = [
     {
         "name": "add",
         "help": "Add an existing folder as vault",
-        "func": add_folder,
+        "func": add_existing_folder,
         "arguments": [] 
     },
     {
@@ -302,40 +274,65 @@ DATABASE_COMMANDS = [
     }
 ]
 
-parser = argparse.ArgumentParser(prog='cli', description='Xenolyte Vault Management CLI')
-parser.add_argument('-v', '--verbose', action='count', default=0, help='Increase verbosity (use -vvv for debug)')
+XENOLYTE_COMMANDS = [
+    {
+        "name": "init",
+        "help": "Initialize Xenolyte for first time use.",
+        "func": initialize_xenolyte,
+        "arguments": []
+    }
+]
 
-subparsers = parser.add_subparsers(title='Commands', dest='command', required=True)
 
-vault_parser = subparsers.add_parser('vault', help='Vault management commands')
-vault_subparsers = vault_parser.add_subparsers(title='Vault Subcommands', dest='vault_command', required=True)
+def main():
 
-for cmd in VAULT_COMMANDS:
-    subparser = vault_subparsers.add_parser(cmd["name"], help=cmd["help"])
-    for arg in cmd["arguments"]:
-        subparser.add_argument(arg["name"], type=arg["type"], help=arg["help"])
-    subparser.set_defaults(func=cmd["func"])
+    parser = argparse.ArgumentParser(prog='cli', description='Xenolyte Vault Management CLI')
+    parser.add_argument('-v', '--verbose', action='count', default=0, help='Increase verbosity (use -vvv for debug)')
 
-database_parser = subparsers.add_parser('database', help='Database management commands')
-database_subparsers = database_parser.add_subparsers(title='Database Subcommands', dest='db_command', required=True)
+    subparsers = parser.add_subparsers(title='Commands', dest='command', required=True)
 
-for cmd in DATABASE_COMMANDS:
-    subparser = database_subparsers.add_parser(cmd["name"], help=cmd["help"])
-    for arg in cmd["arguments"]:
-        subparser.add_argument(arg["name"], type=arg["type"], help=arg["help"])
-    subparser.set_defaults(func=cmd["func"])
+    vault_parser = subparsers.add_parser('vault', help='Vault management commands')
+    vault_subparsers = vault_parser.add_subparsers(title='Vault Subcommands', dest='vault_command', required=True)
 
-args = parser.parse_args()
+    for cmd in VAULT_COMMANDS:
+        subparser = vault_subparsers.add_parser(cmd["name"], help=cmd["help"])
+        for arg in cmd["arguments"]:
+            subparser.add_argument(arg["name"], type=arg["type"], help=arg["help"])
+        subparser.set_defaults(func=cmd["func"])
 
-if args.verbose >= 3:
-    loglevel = logging.DEBUG
-elif args.verbose == 2:
-    loglevel = logging.INFO
-elif args.verbose == 1:
-    loglevel = logging.WARNING
-else:
-    loglevel = logging.ERROR
+    database_parser = subparsers.add_parser('database', help='Database management commands')
+    database_subparsers = database_parser.add_subparsers(title='Database Subcommands', dest='db_command', required=True)
 
-logging.basicConfig(level=loglevel, format='%(levelname)s: %(message)s')
+    for cmd in DATABASE_COMMANDS:
+        subparser = database_subparsers.add_parser(cmd["name"], help=cmd["help"])
+        for arg in cmd["arguments"]:
+            subparser.add_argument(arg["name"], type=arg["type"], help=arg["help"])
+        subparser.set_defaults(func=cmd["func"])
+    
+    xenolyte_parser = subparsers.add_parser('xenolyte', help='Xenolyte management commands')
+    xenolyte_subparsers = xenolyte_parser.add_subparsers(title='Xenolyte Subcommands', dest='db_command', required=True)
 
-args.func(args=args)
+    for cmd in XENOLYTE_COMMANDS:
+        subparser = xenolyte_subparsers.add_parser(cmd["name"], help=cmd["help"])
+        for arg in cmd["arguments"]:
+            subparser.add_argument(arg["name"], type=arg["type"], help=arg["help"])
+        subparser.set_defaults(func=cmd["func"])
+
+    args = parser.parse_args()
+
+    if args.verbose >= 3:
+        loglevel = logging.DEBUG
+    elif args.verbose == 2:
+        loglevel = logging.INFO
+    elif args.verbose == 1:
+        loglevel = logging.WARNING
+    else:
+        loglevel = logging.ERROR
+
+    logging.basicConfig(level=loglevel, format='%(levelname)s: %(message)s')
+
+    args.func(args=args)
+
+
+if __name__ == "__main__":
+    main()

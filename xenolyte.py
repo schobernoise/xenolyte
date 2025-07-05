@@ -1,170 +1,79 @@
-import model
+import utils
+import os, shutil
 import logging
-from controller import utils
 from datetime import datetime
-
-VAULTS = "data/vaults.csv"
+from vault import Vault
 
 XENOLYTE_CONFIG_TEMPLATE = {
-    "id": "generate_id",
     "theme": "default",
     "default_column_width": 20,
-    "backup_path": ""
+    "global_backup_enabled": True,
+    "global_backup_path": "",
+    "vaults_csv": "data/vaults.csv"
 }
 
-def return_recent_vault():
-    """Checks vaults.csv and returns most recent (active) vault. If empty, return False."""
-    logging.info("xenolyte: Return recent vault")
-    vaults = model.records.read_records(VAULTS)
-    if vaults:
-        return max(vaults, key=lambda obj: obj["modified"])
+class Xenolyte:
 
-
-def return_all_vaults():
-    """Reads vaults.csv and returns a list of all vaults."""
-    logging.info("xenolyte: Return all  vaults")
-    return model.records.read_records(VAULTS)
-
-
-def get_vault_from_name(name):
-    vaults = model.records.read_records(VAULTS)
-    for vault in vaults:
-        if name in vault["path"]:
-            return vault
-    return False
-
-
-def append_vault(path):
-    model.records.create_record(VAULTS,
-        {path: path,
-        modified: datetime.now()
-        })
-    return path
-
-
-def create_vault(path):
-    vaults = model.records.read_records(VAULTS)
-    for vault in vaults:
-        if vault["path"] == path:
-            set_vault_modified_now(path)
-            logging.info("Vault already in path, selecting it now.")
-            return
-    append_vault(path)
-    create_xenolyte_json(path) # Also checks, if file aready exists.
-
-
-def set_vault_modified_now(path):
-    vaults = model.records.read_records(VAULTS)
-    updated_vaults = vaults.copy()
-    for vault in updated_vaults:
-            if vault["path"] == path:
-                vault["modified"] = datetime.now()
-            else: 
-                return False
-    model.records.overwrite_records(VAULTS,updated_vaults)
-    return updated_vaults
-
-
-
-def create_vaults_csv():
-    """
-    Checks if the VAULTS file exists.
-    If it exists, returns True.
-    If not, creates the CSV file with headers 'path' and 'created' and returns False.
+    def __init__(self,first_vault_path=False):
+        self.vaults = []
+        if first_vault_path:
+            self.inititalize_xenolyte(first_vault_path)
+        self.config = self.fetch_config()
+        for vault in utils.read_csv(self.config["vaults_csv"]):
+            self.vaults.append(Vault(vault["path"]))
+        
+        
+    def reflect_changes(self):
+        utils.write_json("./data/xenolyte.json",self.config)
+        self.write_vaults_csv()
+        
     
-    Returns:
-        bool: True if the file exists, False otherwise.
-    """
-    if VAULTS.exists():
-        return model.records.read_records(VAULTS)
-    else:
-        # Create parent directories if they don't exist
-        try:
-            VAULTS.parent.mkdir(parents=True, exist_ok=True)
-            logging.debug(f"Ensured directory exists: {VAULTS.parent}")
-        except Exception as e:
-            logging.debug(f"Error creating directories: {e}")
-            return False
-        
-        # Create the CSV file with headers
-        try:
-            with VAULTS.open(mode='w', newline='', encoding='utf-8') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(['path', 'created'])
-            logging.debug(f"Created file with headers at: {VAULTS}")
-            return False
-        except IOError as e:
-            logging.debug(f"Error creating file {VAULTS}: {e}")
-            return False
+    def inititalize_xenolyte(self,first_vault_path):
+        utils.write_json("./data/xenolyte.json",XENOLYTE_CONFIG_TEMPLATE)
+        self.create_new_vault(first_vault_path)
+        self.write_vaults_csv()
 
 
-def delete_vault_from_vaults(index: int):
-    vaults = model.records.read_records(VAULTS)
-    updated_vaults = vaults.copy()
-    del updated_vaults[index]
-    model.records.overwrite_records(VAULTS,updated_vaults)
-    return updated_vaults
+    def fetch_config(self):
+        return utils.read_json("./data/xenolyte.json")
 
 
-def create_xenolyte_json(path: str, overwrite: bool = False, backup: bool = False):
-    """
-    Creates a xenolyte.json configuration file in the specified directory.
-
-    Args:
-        path (str): The directory path where xenolyte.json will be created.
-        overwrite (bool, optional): If True, overwrite the file if it exists. Defaults to False.
-        backup (bool, optional): If True and overwrite is enabled, create a backup of the existing file. Defaults to False.
-    """
-    try:
-        directory = Path(path)
-        xenolyte_config = directory / "xenolyte.json"
-
-        logging.debug(f"Attempting to create xenolyte.json at: {xenolyte_config}")
-
-        if not directory.exists():
-            logging.info(f"Directory {directory} does not exist. Creating it.")
-            directory.mkdir(parents=True, exist_ok=True)
-
-        if xenolyte_config.exists():
-            if overwrite:
-                if backup:
-                    backup_path = xenolyte_config.with_suffix('.bak')
-                    xenolyte_config.rename(backup_path)
-                    logging.info(f"Existing file backed up to {backup_path}")
-                logging.warning(f"File {xenolyte_config} already exists and will be overwritten.")
-            else:
-                logging.info(f"File {xenolyte_config} already exists. Skipping creation.")
-                return None
-
-        with xenolyte_config.open(mode="w", encoding="utf-8") as f:
-            json.dump(XENOLYTE_CONFIG_TEMPLATE, f, indent=4)
-        
-        logging.info(f"Created {xenolyte_config}")
-        return xenolyte_config
-
-    except Exception as e:
-        logging.error(f"Failed to create xenolyte.json in {path}: {e}")
-        return None
+    def fetch_all_vaults(self):
+        return self.vaults
         
 
-def read_xenolyte_json(path):
-    return json.load(os.path.join(path,"xenolyte.json"))
+    def fetch_recent_vault(self):
+        return max(self.vaults, key=lambda obj: obj.config["modified"])
 
 
-def update_xenolyte_json(path, updated_config):
-    config_path = os.path.join(path,"config.json")
-    try:
-        config_json = json.dumps(updated_config, indent=4)
-
-        with tempfile.NamedTemporaryFile('w', delete=False, dir=config_path.parent, encoding='utf-8') as tmp_file:
-            tmp_file.write(config_json)
-            temp_path = Path(tmp_file.name)
-
-        config_path.replace(temp_path)
-
-        print(f"{config_path} has been atomically updated.")
-        return True
-
-    except Exception as e:
-        print(f"An error occurred during atomic update: {e}")
+    def fetch_vault(self,name):
+        for vault in self.vaults:
+            if name == vault.name:
+                return vault
         return False
+
+
+    def create_new_vault(self,path):
+        self.vaults.append(Vault(path,init=True))
+        self.reflect_changes()
+    
+
+    def add_exisiting_vault(self,path):
+        self.vaults.append(Vault(path))
+        self.reflect_changes()
+        
+
+    def write_vaults_csv(self):
+        for vault in self.vaults:
+            vault_paths.append({"path": vault.path})
+        utils.write_csv(self.config["vaults_csv"],vault_paths)
+
+
+    def forget_vault(self,name):
+        """This does NOT delete the Vault Folder."""
+        for vault in self.vaults:
+            if vault.name == name:
+                self.vaults.remove(vault)
+                self.reflect_changes()
+                return vault
+
