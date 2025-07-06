@@ -71,6 +71,7 @@ class Database(table.Table):
             logging.info("create Record Folder")
             record = self.fetch_record(id)
             utils.create_empty_folder(os.path.join(self.path,f"{record.id} {record.slug}"))
+            self.create_record_note(id)
 
             
         def create_all_record_folders(self):

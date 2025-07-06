@@ -9,7 +9,7 @@ VAULT_CONFIG_TEMPLATE = {
     "theme": "default",
     "default_column_width": 20,
     "backup_path": "",
-    "modified": ""
+    "modified": "",
 }
 
 class Vault:
@@ -18,9 +18,10 @@ class Vault:
         self.containers = []
         self.path = path
         self.name = utils.get_folder_name(path)
-        self.config = self.fetch_vault_config()
         if init:
             self.initialize_vault()
+        self.config = self.fetch_vault_config()
+        self.set_vault_modified_now()
         self.containers = self.read_all_containers_from_dir()
         self.__str__ = self.name
 
@@ -29,7 +30,7 @@ class Vault:
         if not os.path.isdir(self.path):
             utils.create_empty_folder(self.path)
         utils.write_json(os.path.join(self.path,f"{self.name}.json"),VAULT_CONFIG_TEMPLATE)
-        self.reflect_changes()
+        # self.reflect_changes()
 
     
     def reflect_changes(self):
@@ -92,7 +93,7 @@ class Vault:
         # TODO: Expand fn to general query functionality.
         logging.info("Get Table from Name")
         for container in self.containers:
-            if container["name"] == name:
+            if container.name == name:
                 return container
         return False
 

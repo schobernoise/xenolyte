@@ -16,9 +16,10 @@ class Xenolyte:
 
     def __init__(self,first_vault_path=False):
         self.vaults = []
+        self.config = self.fetch_config()
+        self.fieldnames = ["path"]
         if first_vault_path:
             self.inititalize_xenolyte(first_vault_path)
-        self.config = self.fetch_config()
         for vault in utils.read_csv(self.config["vaults_csv"]):
             self.vaults.append(Vault(vault["path"]))
         
@@ -29,9 +30,9 @@ class Xenolyte:
         
     
     def inititalize_xenolyte(self,first_vault_path):
-        utils.write_json("./data/xenolyte.json",XENOLYTE_CONFIG_TEMPLATE)
-        self.create_new_vault(first_vault_path)
+        # utils.write_json("./data/xenolyte.json",XENOLYTE_CONFIG_TEMPLATE)
         self.write_vaults_csv()
+        self.create_new_vault(first_vault_path)
 
 
     def fetch_config(self):
@@ -64,9 +65,11 @@ class Xenolyte:
         
 
     def write_vaults_csv(self):
+        logging.debug("Write Vaults CSV")
+        vault_paths = []
         for vault in self.vaults:
-            vault_paths.append({"path": vault.path})
-        utils.write_csv(self.config["vaults_csv"],vault_paths)
+            vault_paths.append({"path":vault.path})
+        utils.write_csv(self.config["vaults_csv"],vault_paths,self.fieldnames)
 
 
     def forget_vault(self,name):

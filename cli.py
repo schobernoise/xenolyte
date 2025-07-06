@@ -9,7 +9,7 @@ import utils
 
 def initialize_xenolyte(args):
     print("Welcome to XENOLYTE.")
-    if not os.path.exists("./data/xenolyte.json"):
+    if not os.path.exists("./data/vaults.csv"):
         first_vault_path = input("Please provide your first Vault path: ")
         _xeno = Xenolyte(first_vault_path=first_vault_path)
 
@@ -18,7 +18,7 @@ def list_vaults(args):
     _xeno = Xenolyte()
     vaults = _xeno.fetch_all_vaults()
     for vault in vaults:
-        print(vault)
+        print(vault.name)
 
 
 def add_existing_folder(args):
@@ -43,7 +43,7 @@ def show_selected_vault(args):
     logging.debug(f"{args}")
     _xeno = Xenolyte()
     active_vault = _xeno.fetch_recent_vault()
-    print(active_vault)
+    print(active_vault.name)
 
 
 def show_vault_config(args):
@@ -56,15 +56,15 @@ def show_vault_config(args):
 def list_tables(args):
     _xeno = Xenolyte()
     logging.debug(f"{args}")
-    active_vault = _xeno.return_recent_vault()
+    active_vault = _xeno.fetch_recent_vault()
     for container in active_vault.containers:
-        print(container) 
+        print(container.name) 
 
 
 def delete_table(args):
     logging.debug(f"{args}")
     _xeno = Xenolyte()
-    active_vault = _xeno.return_recent_vault()
+    active_vault = _xeno.fetch_recent_vault()
     active_vault.delete_container(args.table)
     # TODO Confirm before delete - show data sample
 
@@ -73,7 +73,7 @@ def create_record(args):
     # TODO Get Types form config.json, show near input
     _xeno = Xenolyte()
     logging.debug(f"{args}")
-    active_vault = _xeno.return_recent_vault()
+    active_vault = _xeno.fetch_recent_vault()
     table = active_vault.get_container_from_name(args.table)
     new_record = utils.create_wizard(table.fieldnames)
     table.create_record(new_record)
@@ -82,7 +82,7 @@ def create_record(args):
 def update_record(args):
     logging.debug(f"{args}")
     _xeno = Xenolyte()
-    active_vault = _xeno.return_recent_vault()
+    active_vault = _xeno.fetch_recent_vault()
     table = active_vault.get_container_from_name(args.table)
     record = table.fetch_record(args.record_id)
     updated_record = utils.update_wizard(record)
@@ -99,7 +99,7 @@ def delete_record(args):
 def show_record(args):
     _xeno = Xenolyte()
     logging.debug(f"{args}")
-    active_vault = _xeno.return_recent_vault()
+    active_vault = _xeno.fetch_recent_vault()
     table = active_vault.get_container_from_name(args.table)
     record = table.fetch_record(args.record_id)
     print(utils.object_to_table(record))
@@ -108,21 +108,24 @@ def show_record(args):
 def list_records(args):
     _xeno = Xenolyte()
     logging.debug(f"{args}")
-    active_vault = _xeno.return_recent_vault()
+    active_vault = _xeno.fetch_recent_vault()
     table = active_vault.get_container_from_name(args.table)
-    print(utils.dicts_to_table(table.records))
+    if table:
+        print(utils.dicts_to_table(table.records))
+    else:
+        print("No Records found")
 
 
 def show_vault_readme(args):
     logging.debug(f"{args}")
     _xeno = Xenolyte()
-    active_vault = _xeno.return_recent_vault()
+    active_vault = _xeno.fetch_recent_vault()
     print(active_vault.fetch_vault_config())
 
 
 # def show_database_config(args):
 #     _xeno = Xenolyte()
-#     active_vault = _xeno.return_recent_vault()
+#     active_vault = _xeno.fetch_recent_vault()
 #     active_vault.get_container_from_name(args.table)
 #     logging.debug(f"{args}")
 #     print(_xeno)
@@ -329,7 +332,7 @@ def main():
     else:
         loglevel = logging.ERROR
 
-    logging.basicConfig(level=loglevel, format='%(levelname)s: %(message)s')
+    logging.basicConfig(level=loglevel, format='%(levelname)s | %(funcName)s | %(message)s')
 
     args.func(args=args)
 

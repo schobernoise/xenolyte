@@ -37,7 +37,7 @@ class Table:
 
     def fetch_record(self,id):
         for record in self.records:
-            if record.id == id:
+            if record["id"] == id:
                 return record
     
 

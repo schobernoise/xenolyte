@@ -14,10 +14,11 @@ def create_empty_folder(path):
 
 
 def create_wizard(keys):
+    logging.debug(f"keys")
     print("##### CREATE WIZARD #####")
     new_record = {}
     for key in keys:
-        if 'id' in key.lower():
+        if 'id' is key.lower():
             continue
         value = input(f"Enter value for '{key}': ")
         new_record[key] = value
@@ -53,9 +54,9 @@ def read_csv(file):
 
 
 def read_json(file):
-    with open(os.path.join(file), 'r') as f:
-            config = json.load(f)
-            return config
+    with open(file, 'r') as f:
+            content = json.load(f)
+            return content
 
 def write_json(file,content):
     with open(file , "w") as f:
@@ -63,7 +64,7 @@ def write_json(file,content):
     logging.info(f"Written {file }")
 
 
-def write_csv(self,file,records,fieldnames):
+def write_csv(file,records,fieldnames):
     with open(file, 'w', encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter=";", extrasaction='ignore')
         writer.writeheader()
