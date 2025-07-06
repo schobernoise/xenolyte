@@ -1,54 +1,6 @@
 # Xenolyte
 
-> Python-based GUI for managing local CSV Databases. Using PyQt6.
-
-## Tasks
-
-The plan is to get the CLI fully working before plugging it into the GUI.
-
-- [x] Add Vault to vaults.csv
-- [ ] Create .xenolyte.json
-- [ ] Read .xenolyte.json
-
-- [ ] Read Database Folder
-  - [ ] Read Markdown File
-  - [x] Read config.json
-  - [x] Read database.csv
-  - [ ] Read Functions.py
-
-- [x] Create Database Folder **Fn**
-  - [x] Create README.md
-  - [x] Create config.json
-  - [x] Create Database CSV
-  - [ ] Create functions.py
-- [x] Create Table (CSV) **Fn**
-  - [x] New Table CSV
-  - [ ] Extend existing Database Folder with more Tables for types.
-- [x] Create Folder from Record **Fn**
-  - [x] Create Subfolder
-  - [x] Add Markdown Folder Note
-  - [x] Add attachments Folder
-
-- [ ] CLI Tools
-  - [ ] Vaults functions
-  - [ ] Database Functions
-  - [ ] Custom Functions
-
-- [ ] PyQt6 GUI
-  - [x] Rapid Prototype
-
-![](ressources/gui%20development%202025.png?raw=true)
-
-
-### Future Features
-
-- Lightweight mini input form window to add new records, triggered by cli.
-- Table-Templates
-  - Frequently used table layouts like [id,title,slug,status,description] 
-- Automatic photo compression and thumbnail caching.
-- Calendar/Kanban View
-- Version controll with git, syncing vault or single databases.
-
+> Python CLI and PyQt6 GUI for managing local, CSV-based folder databases.
 
 ## Concept and Terminology
 
@@ -56,9 +8,13 @@ Xenolyte, very much like Obsidian, opens a folder as **Vault**. This Folder gets
 
 You will have an empty room to fill with your data. When **Obsidian** is all about text based information then **Xenolyte** is aiming at tabular data. Altough it utilzes markdown notes to attach information to rows or folders. The idea is to have information structured in a way that is easily comprehensable for humans in openly accessible file formats, but in a standardized way so Xenolyte can read and manipulate it.
 
-A Vault can have multiple csv-files. Those are called tables. A table by itself has the ability to contain anything a csv file can contain. 
+A Vault can have multiple **containers**, alongside an equally named json-file for metadata. A container in its most basic form is a csv-file in the vault, which is called a **table**. You can, however, expand this table to become a **database**. A database is a subfolder of the vault that contains an equally named csv file (the table), a `config.json` containing metadata about columns and the database, an equally named markdown-file as folder note and a **functions.py**. The python file is containing a class extending the Xenolyte-class. It has access to all Vault-Objects, so you are able to create custom functions and cli-commands.
 
-> Vault Structure
+A **record** is one row of a table. If the table becomes a Database the record is able to have a **record-folder**. This record-folder itself contains a Markdown-File and every other file you like.
+
+## Structure
+
+### Vault Structure with tables
 
 - vault/
   - .xenolyte.json
@@ -68,15 +24,14 @@ A Vault can have multiple csv-files. Those are called tables. A table by itself 
   - table2.csv
 
 
-> **Note for the future:** I have plans to implement prefix-inferred column-typing but this is not a top priority right now. But this would enable to type plain csv files as well, which is imperative to work with those tables like airtable or baserow.
-
 You can create as many tables as you like to store simple tabular data. When you feel the need to organize textual information and files in a tabular manner then the time has come to introduce databases. A database is a folder inside your vault that consists of the following structure:
 
 
-> Database Structure
+### Database Structure
 
 - database/
   - database.csv
+  - database.md
   - functions.py
   - config.json
   - 001 record1/
@@ -95,10 +50,43 @@ Where the leading number represents the index id in the csv file that is named a
 
 The functions.py contains a pre-generated **class Vault**. Every method of this class gets added as a button to the toolbox area in the application and gets its own cli-command. They receive an object with an array of all vaults and all variables of config.json which enables users to create their own settings for their own functions.
 
+## How to use
 
-## Usecases
+### First Time Use
 
-All of the usescases can be located in any cloud service.
+Coming soon.
+
+## Using it
+
+### Logging
+
+### Vault Commands
+
+### Database Commands
+
+> Will be renamed to Container Commands in the future.
+
+`python cli.py -vvv database listrecords <database_name>`
+`python cli.py -vvv database showrecord <database_name> <record_id>`
+
+### Filesystem
+
+Any Vault can be located in any cloud-location, e.g. Nextcloud.
+
+**Some usecases include but are not limted to:**
 
 - Cataloging a collection of fossils, rocks, plants, etc and adding metdata to it as well as photos and documents.
 - Contact list, booking catalogue, CRM
+
+
+## Future Features
+
+- Lightweight mini input form window to add new records, triggered by cli.
+- Table-Templates
+  - Frequently used table layouts like [id,title,slug,status,description] 
+- Automatic photo compression and thumbnail caching.
+- Calendar/Kanban View
+- Version control with git, syncing vault or single databases.
+
+
+> **Note for the future:** I have plans to implement prefix-inferred column-typing but this is not a top priority right now. This would enable to type plain csv files as well, which is imperative to work with those tables like airtable or baserow.

@@ -1,0 +1,7 @@
+{
+    "theme": "default",
+    "default_column_width": 20,
+    "global_backup_enabled": true,
+    "global_backup_path": "",
+    "vaults_csv": "data/vaults.csv"
+}
