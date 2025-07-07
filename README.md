@@ -54,11 +54,27 @@ The functions.py contains a pre-generated **class Vault**. Every method of this 
 
 ### First Time Use
 
-Coming soon.
+> To be expanded.
+
+#### CLI
+
+Copy the `xenolyte.template.json` from the `ressources` dir into the data dir and rename it to `xenolyte.json`. This enables you to run the first time initialize command:
+
+```python cli.py xenolyte init```
+
+Which will prompt you for a path to your first vault location. It then sets up a `vaults.csv` in a predefined location, found at the `xenolyte.json` file.
+
+#### GUI
+
+> Not yet in development.
 
 ## Using it
 
 ### Logging
+
+Using the CLI makes it possible to enable various loglevels for detailed debugging.  
+
+`python cli.py -vvv xenolyte`
 
 ### Vault Commands
 
@@ -66,7 +82,7 @@ Coming soon.
 
 > Will be renamed to Container Commands in the future.
 
-`python cli.py -vvv database listrecords <database_name>`
+
 `python cli.py -vvv database showrecord <database_name> <record_id>`
 
 ### Filesystem

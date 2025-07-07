@@ -19,6 +19,7 @@ class Table:
         self._type = "table"
         self.fieldnames = utils.get_fieldnames_from_file(self.table_path)
         self.__str__ = self.name
+        
 
     
     def reflect_changes(self):
@@ -42,29 +43,34 @@ class Table:
     
 
     def create_record(self,new_record):
-        # TODO: Create Function for ID-Handling
         # TODO: Index Argument for inserting inbetween
+        new_record["id"] = self.create_id()
         self.records.append(new_record)
         self.reflect_changes()
+    
+
+    def create_id(self,_type="increment"):
+        return str(int(self.records[-1]["id"]) + 1)
 
 
     def delete_record(self,id):
         """Deletes Record from Table."""
         for record in self.records:
-            if record.id == id:
+            if record["id"] == id:
                 self.records.remove(record)
                 self.reflect_changes()
-                logging.info("Deleted Record", id)
+                logging.info(f"Deleted Record {id}")
                 return record
+            return False
         
     
     def update_record(self, updated_record):
         """Updates a record."""
         for i, record in enumerate(self.records):
-            if record.id == updated_record.id:
+            if record["id"]== updated_record["id"]:
                 self.records[i] = updated_record
                 self.reflect_changes()
-                logging.info("Updated Record", record.id)
+                logging.info(f"Updated Record {record["id"]}")
                 return record
     
 

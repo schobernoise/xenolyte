@@ -2,6 +2,8 @@ import os
 import csv
 import json
 import logging
+import pathlib
+import uuid
 
 
 def get_folder_name(path):
@@ -10,7 +12,7 @@ def get_folder_name(path):
 
 
 def create_empty_folder(path):
-    os.mkdir(path)
+    pathlib.Path(path).mkdir(parents=True, exist_ok=True)
 
 
 def create_wizard(keys):
@@ -18,7 +20,7 @@ def create_wizard(keys):
     print("##### CREATE WIZARD #####")
     new_record = {}
     for key in keys:
-        if 'id' is key.lower():
+        if 'id' == key.lower():
             continue
         value = input(f"Enter value for '{key}': ")
         new_record[key] = value
@@ -28,8 +30,9 @@ def create_wizard(keys):
 def update_wizard(record):
     print("##### UPDATE WIZARD #####")
     new_record = {}
-    for key in record.keys:
-        if 'id' in key.lower():
+    for key in record.keys():
+        if 'id' == key.lower():
+            new_record["id"] = record["id"]
             continue
         print(record[key])
         new_record[key] = input(f"Enter value for '{key}': ") or record[key]
@@ -119,3 +122,7 @@ def dicts_to_table(dicts):
         table = table.rstrip(' | ') + '\n'
 
     return table
+
+
+def generate_uuid():
+    return uuid.uuid4().hex

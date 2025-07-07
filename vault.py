@@ -94,6 +94,7 @@ class Vault:
         logging.info("Get Table from Name")
         for container in self.containers:
             if container.name == name:
+                logging.debug(f"Found Container {name}")
                 return container
         return False
 

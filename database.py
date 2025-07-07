@@ -8,7 +8,7 @@ import shutil
 today = date.today()
 
 CONFIG_TEMPLATE = {
-    "id": "generate_id",
+    "id_type": "increment",
     "columns": [
         {
             "name": "id",
@@ -22,12 +22,14 @@ CONFIG_TEMPLATE = {
 class Database(table.Table):
 
         def __init__(self, path, records=False, init=False):
-            logging.debug(f"Creating Database: {path}")
+            logging.debug(f"Loading Database: {path}")
             self.path = os.path.split(os.path.normpath(path))[0]
             self.name = utils.get_folder_name(self.path.replace(".csv",""))
             logging.debug(f"Database Name: {self.name}")
             self.table_path = os.path.join(self.path, self.name + ".csv")
-            if init:
+            if not os.path.exists(os.path.join(self.path,"config.json")) or init:
+                logging.error("config.json was not found.")
+                # raise FileNotFoundError("Please provide xenolyte.json. Copy the template file from the repo.")  
                 self.initialize_database(records)
             self.fieldnames = utils.get_fieldnames_from_file(self.table_path)
             if records:
@@ -35,10 +37,11 @@ class Database(table.Table):
             else:
                 self.records = utils.read_csv(os.path.join(self.path, f"{self.name}.csv"))
             self._type = "database"
-            self.config = self.fetch_config_json
+            self.config = self.fetch_config_json()
             if not os.path.exists(os.path.join(self.path,self.name + ".md")):
                 self.create_database_note()
             self.note = self.fetch_database_note()
+            # logging.debug(f"{self.records}")
         
 
         def reflect_changes(self):
@@ -51,12 +54,13 @@ class Database(table.Table):
                 records = [{"id": 0}]
             utils.create_empty_folder(self.path)
             self.write_config_json(CONFIG_TEMPLATE)
-            utils.write_csv(self.table_path,records,records[0].keys())
+            if not os.path.exists(self.table_path):
+                utils.write_csv(self.table_path,records,records[0].keys())
             self.create_functions_py()
             self.create_database_note()
             if create_folders:
                 self.create_all_record_folders()
-            self.reflect_changes()
+            # self.reflect_changes()
 
         
         # TODO: Extend every record with properties 
@@ -84,15 +88,17 @@ class Database(table.Table):
 
 
         def write_config_json(self,config):
+            logging.debug(f"{config}")
             config_path = os.path.join(self.path,"config.json")
-            utils.write_json(config_path,config)
+            if not os.path.exists(config_path):
+                utils.write_json(config_path,config)
         
 
         def fetch_config_json(self):
-            return utils.read_json(self.path,"config.json")
+            return utils.read_json(os.path.join(self.path,"config.json"))
         
 
-        def create_database_note(self):
+        def create_database_note(self): 
             DATABASE_NOTE_TEMPLATE = f"""# Database - {self.name} 
 """
             with open(os.path.join(self.path,self.name + ".md"), 'w') as f:

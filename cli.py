@@ -24,9 +24,17 @@ def list_vaults(args):
 def add_existing_folder(args):
     _xeno = Xenolyte()
     logging.debug(f"{args}")
-    path = input("Enter existing folder path: ")
+    path = input("Enter existing vault path: ")
     _xeno.add_exisiting_vault(path)
-    list_vaults()
+    list_vaults(args)
+
+
+def create_vault(args):
+    _xeno = Xenolyte()
+    logging.debug(f"{args}")
+    path = input("Enter new vault path: ")
+    _xeno.create_new_vault(path)
+    list_vaults(args)
 
 
 def select_vault(args):
@@ -69,6 +77,20 @@ def delete_table(args):
     # TODO Confirm before delete - show data sample
 
 
+def create_table(args):
+    # Also run create-wizard
+    pass
+
+
+def create_database(args):
+    # Also run create-wizard
+    pass
+
+
+def convert_table_to_database(args):
+    pass
+
+
 def create_record(args):
     # TODO Get Types form config.json, show near input
     _xeno = Xenolyte()
@@ -80,11 +102,15 @@ def create_record(args):
     
 
 def update_record(args):
-    logging.debug(f"{args}")
     _xeno = Xenolyte()
     active_vault = _xeno.fetch_recent_vault()
     table = active_vault.get_container_from_name(args.table)
     record = table.fetch_record(args.record_id)
+    logging.debug(f"{args}")
+    logging.debug(f"{record}")
+    if not record:
+        logging.error(f"Record Id {args.record_id} not found.")
+        return
     updated_record = utils.update_wizard(record)
     table.update_record(updated_record)
 
@@ -92,8 +118,9 @@ def update_record(args):
 def delete_record(args):
     logging.debug(f"{args}")
     _xeno = Xenolyte()
-    table = active_vault.get_container_from_name(args.table)
-    database.delete_record()
+    active_vault = _xeno.fetch_recent_vault()
+    container = active_vault.get_container_from_name(args.table)
+    container.delete_record(args.record_id)
 
 
 def show_record(args):
@@ -165,6 +192,12 @@ VAULT_COMMANDS = [
         "help": "List all currently selected vaults",
         "func": list_vaults,
         "arguments": []  
+    },
+    {
+        "name": "create",
+        "help": "Create a new Vault Folder.",
+        "func": create_vault,
+        "arguments": [] 
     },
     {
         "name": "add",

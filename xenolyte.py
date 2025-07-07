@@ -15,11 +15,19 @@ XENOLYTE_CONFIG_TEMPLATE = {
 class Xenolyte:
 
     def __init__(self,first_vault_path=False):
+        if not os.path.exists("./data/xenolyte.json"):
+            logging.error("xenolyte.json was not found.")
+            raise FileNotFoundError("Please provide xenolyte.json. Copy the template file from the repo.")  
+       
         self.vaults = []
         self.config = self.fetch_config()
         self.fieldnames = ["path"]
         if first_vault_path:
             self.inititalize_xenolyte(first_vault_path)
+        if not os.path.exists(self.config["vaults_csv"]):
+            logging.error(f"{self.config["vaults_csv"]} was not found.")
+            raise FileNotFoundError(f"{self.config["vaults_csv"]} was not found. Most likely Xenolyte was not initialized. Please run 'python cli.py xenolyte init' first. Or provide the correct path in xenolyte.json.")     
+        
         for vault in utils.read_csv(self.config["vaults_csv"]):
             self.vaults.append(Vault(vault["path"]))
         
