@@ -78,17 +78,33 @@ def delete_table(args):
 
 
 def create_table(args):
-    # Also run create-wizard
-    pass
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    active_vault = _xeno.fetch_recent_vault()
+    if not args.table:
+        table_name = input("Provide name of new Table: ")
+    else:
+        table_name = args.table
+    active_vault.create_new_table(table_name)
 
 
 def create_database(args):
-    # Also run create-wizard
-    pass
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    active_vault = _xeno.fetch_recent_vault()
+    if not args.table:
+        table_name = input("Provide name of new Database: ")
+    else:
+        table_name = args.table
+    active_vault.create_new_database(table_name)
 
 
 def convert_table_to_database(args):
-    pass
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    active_vault = _xeno.fetch_recent_vault()
+    active_vault.create_database_from_table(args.table)
+
 
 
 def create_record(args):
@@ -147,7 +163,15 @@ def show_vault_readme(args):
     logging.debug(f"{args}")
     _xeno = Xenolyte()
     active_vault = _xeno.fetch_recent_vault()
-    print(active_vault.fetch_vault_config())
+    print(active_vault.fetch_vault_note())
+
+
+def forget_vault(args):
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    _xeno.forget_vault(args.vault)
+    print(f"Forgetting Vault {args.vault}")
+
 
 
 # def show_database_config(args):
@@ -163,11 +187,6 @@ def show_vault_readme(args):
 #     logging.debug(f"{args}")
 #     pass
 
-
-class CLI():
-
-    def __init__():
-        pass
 
 
 # def backup_vault(args):
@@ -216,6 +235,24 @@ VAULT_COMMANDS = [
         "help": "Display currently selected vault",
         "func": show_selected_vault,
         "arguments": []  
+    },
+    {
+        "name": "show_readme",
+        "help": "Display Readme of the currently selected vault.",
+        "func": show_vault_readme,
+        "arguments": []  
+    },
+    {
+        "name": "forget",
+        "help": "Forget vault by name.",
+        "func": forget_vault,
+        "arguments": [
+            {
+                "name": "vault",
+                "type": str,
+                "help": "The name of the vault to forget."
+            }
+        ]  
     }
 ]
 
@@ -313,6 +350,42 @@ DATABASE_COMMANDS = [
                 "help": "The ID of the record to retrieve"
             }
         ]
+    },
+    {
+        "name": "createtable",
+        "help": "Create a new Table in the active Vault.",
+        "func": create_table,
+        "arguments": [
+            {
+                "name": "table",
+                "type": str,
+                "help": "The name of the table that is going to be created."
+            }
+        ]
+    },
+     {
+        "name": "createdatabase",
+        "help": "Create a new Database in the active Vault.",
+        "func": create_database,
+        "arguments": [
+            {
+                "name": "table",
+                "type": str,
+                "help": "The name of the database that is going to be created."
+            }
+        ]
+    },
+     {
+        "name": "converttabletodb",
+        "help": "Convert an existing Table to a Database.",
+        "func": convert_table_to_database,
+        "arguments": [
+            {
+                "name": "table",
+                "type": str,
+                "help": "The name of the Table that is going to be used."
+            }
+        ]
     }
 ]
 
@@ -371,7 +444,7 @@ def main():
     else:
         loglevel = logging.ERROR
 
-    logging.basicConfig(level=loglevel, format='%(levelname)s | %(funcName)s | %(message)s')
+    logging.basicConfig(level=loglevel, format='%(levelname)s | %(filename)s | %(funcName)s | %(message)s')
 
     args.func(args=args)
 

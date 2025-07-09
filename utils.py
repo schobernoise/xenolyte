@@ -7,9 +7,10 @@ import uuid
 
 
 def get_folder_name(path):
-    logging.info("utils: Get Folder Name")
-    return os.path.split(os.path.normpath(path))[1]
-
+    logging.info(f"Get Folder Name: {path}")
+    if os.path.isfile(path):
+        path = os.path.dirname(path)
+    return os.path.basename(os.path.normpath(path))
 
 def create_empty_folder(path):
     pathlib.Path(path).mkdir(parents=True, exist_ok=True)
@@ -126,3 +127,13 @@ def dicts_to_table(dicts):
 
 def generate_uuid():
     return uuid.uuid4().hex
+
+
+def write_markdown(path, content):
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+
+def read_markdown(path):
+    with open(path, 'r', encoding='utf-8') as f:
+        return f.read()

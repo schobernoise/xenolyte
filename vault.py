@@ -23,6 +23,7 @@ class Vault:
         self.config = self.fetch_vault_config()
         self.set_vault_modified_now()
         self.containers = self.read_all_containers_from_dir()
+        self.note = "" # TODO: Fetch Vault Note
         self.__str__ = self.name
 
 
@@ -53,10 +54,10 @@ class Vault:
             if not self.get_container_from_name(container.name):
                 if isinstance(container, Table):
                     os.remove(container.table_path)
-                    logging.info("Deleted Table CSV", container.name)
+                    logging.info(f"Deleted Table CSV {container.name}" )
                 elif isinstance(container,Database):
                     shutil.rmtree(container.table_path, ignore_errors=True)
-                    logging.info("Deleted Database Dir", container.name)
+                    logging.info(f"Deleted Database Dir {container.name}")
         
         self.set_vault_modified_now() # Writes entire config
         # TODO: Reflect changes returns status and errors
@@ -67,25 +68,23 @@ class Vault:
 
 
     def read_all_containers_from_dir(self):
-        logging.info("Get all Containers")
-        objects=[]
+        logging.info("Initialize all Containers in all Vaults.")
+        containers=[]
         try:
             items = os.listdir(self.path)
         except Exception as e:
             logging.error(f"Error reading directory {self.path}: {e}")
-            return objects
+            return containers
 
         for item in items:
             item_path = os.path.join(self.path, item)
             logging.debug("%s", item_path)
             if os.path.isfile(item_path) and item.lower().endswith('.csv'):
-                objects.append(Table(item_path))
+                containers.append(Table(item_path))
             elif os.path.isdir(item_path):
-                table_path = os.path.join(item_path, f"{item}.csv")
                 # print(table_path)
-                if os.path.isfile(table_path):
-                    objects.append(Database(table_path))
-        return objects
+                containers.append(Database(item_path))
+        return containers
 
 
     def get_container_from_name(self, name):
@@ -102,15 +101,15 @@ class Vault:
     def create_new_table(self,name):
         """Creates a new table inside the active Vault."""
         logging.debug("Create New Table")
-        self.containers.append(Table(os.path.join(self.path,name + ".csv")))
+        self.containers.append(Table(os.path.join(self.path,name + ".csv"),init=True))
         self.reflect_changes()
         logging.info("Created new Table")
     
 
     def create_new_database(self, name):
         """Creates a new database inside the active Vault."""    
-        logging.info("Create New Database")
-        self.containers.append(Database(os.path.join(self.path,name)))
+        logging.info(f"Create New Database {os.path.join(self.path,name)}")
+        self.containers.append(Database(os.path.join(self.path,name),init=True))
         self.reflect_changes()
         logging.info("Created new Database")
         
@@ -143,5 +142,19 @@ class Vault:
     def set_vault_modified_now(self):
         self.config["modified"] = str(datetime.now())
         utils.write_json(os.path.join(self.path,f"{self.name}.json"),self.config)
+    
+
+    def write_vault_note(self, note): 
+        VAULT_NOTE_TEMPLATE = f"""# Database - {self.name} 
+"""     
+        if not note and not self.note:
+            note = VAULT_NOTE_TEMPLATE
+        utils.write_markdown(os.path.join(self.path,self.name + ".md"),note)
 
     
+    def fetch_vault_note(self):
+        if os.path.isfile(os.path.join(self.path,self.name + ".md")):
+            return utils.read_markdown(os.path.join(self.path,self.name + ".md"))
+        else:
+            self.write_vault_note()
+            return utils.read_markdown(os.path.join(self.path,self.name + ".md"))

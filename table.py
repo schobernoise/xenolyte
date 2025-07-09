@@ -14,6 +14,7 @@ class Table:
         self.table_path = path
         self.name = utils.get_folder_name(path)
         if init:
+            self.records = [{"id": "0"}]
             self.intialize_table()
         self.records = utils.read_csv(self.table_path)
         self._type = "table"
@@ -29,7 +30,9 @@ class Table:
 
 
     def intialize_table(self):
-        pass
+            if not os.path.exists(self.table_path):
+                utils.write_csv(self.table_path,self.records,self.records[0].keys())
+            # self.reflect_changes()
 
 
     def fetch_records(self):

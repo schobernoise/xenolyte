@@ -75,7 +75,7 @@ class Xenolyte:
     def write_vaults_csv(self):
         logging.debug("Write Vaults CSV")
         vault_paths = []
-        for vault in self.vaults:
+        for vault in set(self.vaults): # Creating set to clean up duplicates
             vault_paths.append({"path":vault.path})
         utils.write_csv(self.config["vaults_csv"],vault_paths,self.fieldnames)
 
