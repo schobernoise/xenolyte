@@ -2,6 +2,11 @@
 
 > Python CLI and PyQt6 GUI for managing local, CSV-based folder databases.
 
+> [!NOTE]  
+> STATUS: CLI protype is finished. Needs some more review and testing.
+> Next step is creating the GUI skeleton.
+> CLI Documentation is needed.
+
 ## Concept and Terminology
 
 Xenolyte, very much like Obsidian, opens a folder as **Vault**. This Folder gets added to `vaults.csv`, a list of all vaults previously opened. The last one that was opened will be opened automatically when the programm starts.
@@ -52,11 +57,7 @@ The functions.py contains a pre-generated **class Vault**. Every method of this 
 
 ## How to use
 
-### First Time Use
-
-> To be expanded.
-
-#### CLI
+### CLI
 
 Copy the `xenolyte.template.json` from the `ressources` dir into the data dir and rename it to `xenolyte.json`. This enables you to run the first time initialize command:
 
@@ -64,26 +65,49 @@ Copy the `xenolyte.template.json` from the `ressources` dir into the data dir an
 
 Which will prompt you for a path to your first vault location. It then sets up a `vaults.csv` in a predefined location, found at the `xenolyte.json` file.
 
-#### GUI
-
-> Not yet in development.
-
-## Using it
-
-### Logging
+#### Logging
 
 Using the CLI makes it possible to enable various loglevels for detailed debugging.  
 
 `python cli.py -vvv xenolyte`
 
-### Vault Commands
+#### Vault Commands
 
-### Database Commands
+list                List all currently selected vaults
+create              Create a new Vault Folder.
+add                 Add an existing folder as vault
+select              Select a vault from list of vaults
+show                Display currently selected vault
+show_readme         Display Readme of the currently selected vault.
+forget              Forget vault by name.
 
-> Will be renamed to Container Commands in the future.
+`python cli.py vault list`
 
+#### Container Commands
+
+> The use of te terms *database* and *table* was from early development and will be unified to *container*.
+
+listtables          List all records in a table
+listrecords         List all records in a table
+deletetable         Delete Table.
+showrecord          Show a specific record by ID in a table
+deleterecord        Delete a specific record by ID in a table
+createrecord        Create a new Record in a specific table
+createcolumn        Create a new Column in a specific table
+updaterecord        Update an existing Record in a specific table
+createtable         Create a new Table in the active Vault.
+createdatabase      Create a new Database in the active Vault.
+converttabletodb    Convert an existing Table to a Database.
+
+`python cli.py database listtables`
 
 `python cli.py -vvv database showrecord <database_name> <record_id>`
+
+
+### GUI
+
+> Not yet in development.
+
 
 ### Filesystem
 
@@ -103,6 +127,14 @@ Any Vault can be located in any cloud-location, e.g. Nextcloud.
 - Automatic photo compression and thumbnail caching.
 - Calendar/Kanban View
 - Version control with git, syncing vault or single databases.
+
+### Input Validation
+
+User input and container input can be subject of sophisticated validation. Currently I have implemented type checking for simple types. Some ideas for expansion are:
+
+- Date validation and preferred ISO-format in config.json/xenolyte.json.
+- Choice validation. To choose from a list of options. Design-wise a tricky project, since I can have any other type as choice. This is a precursor to relationships.
+- Relationships. To choose a row from another container. Register a primary column of the related container in config.json. Saved will be only the ID of the linked row.
 
 
 > **Note for the future:** I have plans to implement prefix-inferred column-typing but this is not a top priority right now. This would enable to type plain csv files as well, which is imperative to work with those tables like airtable or baserow.

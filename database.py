@@ -87,7 +87,21 @@ class Database(table.Table):
             utils.create_empty_folder(os.path.join(self.path,f"{record.id} {record.slug}"))
             self.create_record_note(id)
 
-            
+        
+        def create_column(self,name,_type="str",width=20):
+            for fieldname in self.fieldnames:
+                if name == fieldname:
+                    logging.error("Columns must have unique names.")
+                    return 0
+            self.fieldnames.append(name)
+            self.config["columns"].append({
+            "name": name,
+            "_type": _type,
+            "width": int(width)
+        })
+            self.reflect_changes()
+
+
         def create_all_record_folders(self):
             for record in self.records:
                 self.create_record_folder(record.id)
@@ -100,8 +114,7 @@ class Database(table.Table):
         def write_config_json(self,config):
             logging.debug(f"{config}")
             config_path = os.path.join(self.path,"config.json")
-            if not os.path.exists(config_path):
-                utils.write_json(config_path,config)
+            utils.write_json(config_path,config)
         
 
         def fetch_config_json(self):

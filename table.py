@@ -22,10 +22,8 @@ class Table:
         self.__str__ = self.name
         
 
-    
     def reflect_changes(self):
         logging.info("Reflect changes...")
-        self.write_table_csv()
         utils.write_csv(self.table_path,self.records,self.fieldnames)
 
 
@@ -43,8 +41,17 @@ class Table:
         for record in self.records:
             if record["id"] == id:
                 return record
-    
 
+
+    def create_column(self,name):
+        for fieldname in fieldnames:
+            if name == fieldname:
+                logging.error("Columns must have unique names.")
+                return 0
+        self.fieldnames.append(name)
+        self.reflect_changes()
+            
+            
     def create_record(self,new_record):
         # TODO: Index Argument for inserting inbetween
         new_record["id"] = self.create_id()

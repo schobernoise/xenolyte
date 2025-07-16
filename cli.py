@@ -73,8 +73,22 @@ def delete_table(args):
     logging.debug(f"{args}")
     _xeno = Xenolyte()
     active_vault = _xeno.fetch_recent_vault()
-    active_vault.delete_container(args.table)
-    # TODO Confirm before delete - show data sample
+    table = active_vault.get_container_from_name(args.table)
+    if table:
+        print(f"Deleting Container {args.table}!")
+        print("Data Sample:")
+        print(utils.object_to_table(table.records[0:5]))
+        choice = input("Are you sure? (y/n)" )
+        if choice == "y":
+            active_vault.delete_container(args.table)
+            return 1
+        elif choice == "n":
+            print("Cancelled Delete.")
+            return 0
+        else:
+            print("Please provide a valid input (y/n).")
+            return 0
+
 
 
 def create_table(args):
@@ -106,16 +120,37 @@ def convert_table_to_database(args):
     active_vault.create_database_from_table(args.table)
 
 
-
 def create_record(args):
-    # TODO Get Types form config.json, show near input
     _xeno = Xenolyte()
     logging.debug(f"{args}")
     active_vault = _xeno.fetch_recent_vault()
-    table = active_vault.get_container_from_name(args.table)
-    new_record = utils.create_wizard(table.fieldnames)
-    table.create_record(new_record)
-    
+    container = active_vault.get_container_from_name(args.table)
+    columns = []
+    if container._type == "database":
+        columns = container.config["columns"]
+    new_record = utils.create_wizard(container.fieldnames, columns=columns)
+    container.create_record(new_record)
+
+
+def create_column(args):
+    _xeno = Xenolyte()
+    logging.debug(f"{args}")
+    if not args.name:
+        print("Please provide a Column name.")
+        return 0
+    active_vault = _xeno.fetch_recent_vault()
+    container = active_vault.get_container_from_name(args.table)
+    if container._type == "table":
+        container.create_column(args.name)
+    elif container._type == "database":
+        _type = args._type
+        width = args.width
+        if not args._type:
+            _type = "str"
+        if not args.width:
+            width = 20
+        container.create_column(args.name, _type=_type, width=width)
+
 
 def update_record(args):
     _xeno = Xenolyte()
@@ -331,6 +366,33 @@ DATABASE_COMMANDS = [
                 "name": "table",
                 "type": str,
                 "help": "The name of the table to create the record in."
+            }
+        ]
+    },
+    {
+        "name": "createcolumn",
+        "help": "Create a new Column in a specific table",
+        "func": create_column,
+        "arguments": [
+            {
+                "name": "table",
+                "type": str,
+                "help": "The name of the table to create the record in."
+            },
+            {
+                "name": "name",
+                "type": str,
+                "help": "The name of the column to be created."
+            },
+            {
+                "name": "_type",
+                "type": str,
+                "help": "The type of the column to be created."
+            },
+            {
+                "name": "width",
+                "type": str,
+                "help": "The default width of the column in PyQt."
             }
         ]
     },
