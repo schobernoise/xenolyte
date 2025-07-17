@@ -5,21 +5,24 @@
 > [!NOTE]  
 > STATUS: CLI protype is finished. Needs some more review and testing.
 > Next step is creating the GUI skeleton.
-> CLI Documentation is needed.
+> Documentation is needed.
+
+> [!TIP]
+> I try to avoid AI tools as much as possible with this project, since I am developing it for fun. Using my brain is a big part of the fun so Artificial Intelligence is not only taking away the fun, it also pushes projects in a results-oriented direction. The journey should be the reward.
 
 ## Concept and Terminology
 
-Xenolyte, very much like Obsidian, opens a folder as **Vault**. This Folder gets added to `vaults.csv`, a list of all vaults previously opened. The last one that was opened will be opened automatically when the programm starts.
+Xenolyte, very much like Obsidian, opens a folder as **Vault**. This Folder gets added to `vaults.csv`which resembles a list of all vaults previously opened. The last one that was opened will be opened automatically when the programm starts.
 
-You will have an empty room to fill with your data. When **Obsidian** is all about text based information then **Xenolyte** is aiming at tabular data. Altough it utilzes markdown notes to attach information to rows or folders. The idea is to have information structured in a way that is easily comprehensable for humans in openly accessible file formats, but in a standardized way so Xenolyte can read and manipulate it.
+You will have an empty room to fill with your data. When **Obsidian** is all about text based information then **Xenolyte** is aiming at tabular data. Altough it utilzes markdown notes to attach information to rows or folders. The idea is to have information structured in a way that is easily comprehensable for humans in openly accessible file formats, but in a formalised way so Xenolyte can read and manipulate it.
 
-A Vault can have multiple **containers**, alongside an equally named json-file for metadata. A container in its most basic form is a csv-file in the vault, which is called a **table**. You can, however, expand this table to become a **database**. A database is a subfolder of the vault that contains an equally named csv file (the table), a `config.json` containing metadata about columns and the database, an equally named markdown-file as folder note and a **functions.py**. The python file is containing a class extending the Xenolyte-class. It has access to all Vault-Objects, so you are able to create custom functions and cli-commands.
+A Vault can have multiple **containers**. A container in its most basic form is a csv-file in the vault, which is called a **table**. You can, however, expand this table to become a **database**. A database is a subfolder of the vault that contains an equally named csv file (the table), a `config.json` containing metadata about columns and the database, an equally named markdown-file as folder note and a **functions.py**. The python file is containing functions that receive the database object. This means, you will be able to manipulate and structure data with you own functions - available through cli.
 
-A **record** is one row of a table. If the table becomes a Database the record is able to have a **record-folder**. This record-folder itself contains a Markdown-File and every other file you like.
+A **record** is one row of a table. If the table becomes a Database, the record is able to have a **record-folder**. This record-folder itself contains a Markdown-File and every other file you like.
 
 ## Structure
 
-### Vault Structure with tables
+### Vault Structure with tables and databases
 
 - vault/
   - .xenolyte.json
@@ -73,13 +76,13 @@ Using the CLI makes it possible to enable various loglevels for detailed debuggi
 
 #### Vault Commands
 
-list                List all currently selected vaults
-create              Create a new Vault Folder.
-add                 Add an existing folder as vault
-select              Select a vault from list of vaults
-show                Display currently selected vault
-show_readme         Display Readme of the currently selected vault.
-forget              Forget vault by name.
+- `list`                List all currently selected vaults
+- `create`              Create a new Vault Folder.
+- `add`                 Add an existing folder as vault
+- `select`              Select a vault from list of vaults
+- `show`                Display currently selected vault
+- `show_readme`         Display Readme of the currently selected vault.
+- `forget`              Forget vault by name.
 
 `python cli.py vault list`
 
@@ -87,21 +90,44 @@ forget              Forget vault by name.
 
 > The use of te terms *database* and *table* was from early development and will be unified to *container*.
 
-listtables          List all records in a table
-listrecords         List all records in a table
-deletetable         Delete Table.
-showrecord          Show a specific record by ID in a table
-deleterecord        Delete a specific record by ID in a table
-createrecord        Create a new Record in a specific table
-createcolumn        Create a new Column in a specific table
-updaterecord        Update an existing Record in a specific table
-createtable         Create a new Table in the active Vault.
-createdatabase      Create a new Database in the active Vault.
-converttabletodb    Convert an existing Table to a Database.
+- `fn`                  Calls a function form functions.py.
+- `listtables`          List all records in a table
+- `listrecords`         List all records in a table
+- `deletetable`         Delete Table.
+- `showrecord`          Show a specific record by ID in a table
+- `deleterecord`        Delete a specific record by ID in a table
+- `createrecord`        Create a new Record in a specific table
+- `createcolumn`        Create a new Column in a specific table
+- `updaterecord`        Update an existing Record in a specific table
+- `createtable`         Create a new Table in the active Vault.
+- `createdatabase`      Create a new Database in the active Vault.
+- `converttabletodb`    Convert an existing Table to a Database.
 
 `python cli.py database listtables`
 
 `python cli.py -vvv database showrecord <database_name> <record_id>`
+
+### functions.py
+
+Every database has its own `functions.py` file, which enables you to work with all of its data and create your own functions.
+
+```python
+# Xenolyte - functions.py
+# All functions in here receive the database instance.
+
+def fill_cells_w_xenolyte(self):
+    """"Example function to demonstrate functions.py
+        Fills all cells with the word 'xenolyte'.
+    """
+    for record in self.records:
+        for key in record.keys():
+            if not record[key]:
+                record[key] = "xenolyte"
+    self.reflect_changes()
+```
+
+You then can call this functon from cli like this:
+`python cli.py -vvv database fn <database> fill_cells_w_xenolyte`
 
 
 ### GUI
@@ -113,10 +139,14 @@ converttabletodb    Convert an existing Table to a Database.
 
 Any Vault can be located in any cloud-location, e.g. Nextcloud.
 
+### Usecases
+
 **Some usecases include but are not limted to:**
 
 - Cataloging a collection of fossils, rocks, plants, etc and adding metdata to it as well as photos and documents.
 - Contact list, booking catalogue, CRM
+- Automated logging and content saving, e.g. a server mith multiple web-scrapers.
+- Writing a journal.
 
 
 ## Future Features

@@ -60,7 +60,11 @@ class Table:
     
 
     def create_id(self,_type="increment"):
-        return str(int(self.records[-1]["id"]) + 1)
+        if _type == "increment":
+            _id = str(int(self.records[-1]["id"]) + 1)
+        elif _type == "uuid":
+            _id = utils.generate_uuid()
+        return _id
 
 
     def delete_record(self,id):

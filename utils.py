@@ -6,7 +6,7 @@ import pathlib
 import uuid
 
 
-SIMPLE_TYPES = ["int","float","bool","str"]
+# SIMPLE_TYPES = ["int","float","bool","str"]
 
 
 def get_folder_name(path):
@@ -187,3 +187,8 @@ def write_markdown(path, content):
 def read_markdown(path):
     with open(path, 'r', encoding='utf-8') as f:
         return f.read()
+
+
+def write_code(path, content):
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)

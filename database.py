@@ -4,6 +4,8 @@ import os
 import logging
 from datetime import date
 import shutil
+import importlib.util
+import sys
 
 today = date.today()
 
@@ -18,6 +20,19 @@ CONFIG_TEMPLATE = {
     ]
 }
 
+FUNCTIONS_TEMPLATE = """
+# Xenolyte - functions.py
+# All functions in here receive the database instance.
+
+def fill_cells_w_xenolyte(self):
+    \"\"\"Example function to demonstrate functions.py
+        Fills all cells with the word 'xenolyte'.
+    \"\"\"
+    for record in self.records:
+        for key in record.keys():
+            if not record[key]:
+                record[key] = "xenolyte"
+    self.reflect_changes()"""
 
 class Database(table.Table):
 
@@ -45,7 +60,31 @@ class Database(table.Table):
             if not os.path.exists(os.path.join(self.path,self.name + ".md")):
                 self.create_database_note()
             self.note = self.fetch_database_note()
-            # logging.debug(f"{self.records}")
+            if not os.path.exists(os.path.join(self.path,"functions.py")):
+                self.create_functions_py()
+            self.functions = self.load_functions(os.path.join(self.path,"functions.py"))
+            # logging.debug(f"{self.functions}")
+            # self.functions.fill_cells_w_random_data(self)
+        
+
+        def load_functions(self,source):
+            # Credit: https://medium.com/@david.bonn.2010/dynamic-loading-of-python-code-2617c04e5f3f
+            """
+            reads file source and loads it as a module
+
+            :param source: file to load
+            :param module_name: name of module to register in sys.modules
+            :return: loaded module
+            """
+
+            module_name = "functions"
+
+            spec = importlib.util.spec_from_file_location(module_name, source)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
+
+            return module
         
 
         def reflect_changes(self):
@@ -108,7 +147,17 @@ class Database(table.Table):
         
 
         def create_functions_py(self):
-            pass
+            functions_path = os.path.join(self.path,"functions.py")
+            utils.write_code(functions_path,FUNCTIONS_TEMPLATE)
+        
+
+        def call_function(self,name):
+            try:
+                fn = getattr(self.functions, name)
+            except:
+                logging.error(f"Please provide a valid function in functions.py.")
+                return 0
+            fn(self)
 
 
         def write_config_json(self,config):

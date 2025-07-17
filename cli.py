@@ -208,6 +208,18 @@ def forget_vault(args):
     print(f"Forgetting Vault {args.vault}")
 
 
+def call_function(args):
+    logging.debug(f"{args}")
+    _xeno = Xenolyte()
+    active_vault = _xeno.fetch_recent_vault()
+    table = active_vault.get_container_from_name(args.table)
+    if table._type == "database":
+        table.call_function(args.function)
+    else:
+        print(f"{table.name} is not a database, functions are only available in databases.")
+        return 0
+
+
 
 # def show_database_config(args):
 #     _xeno = Xenolyte()
@@ -221,7 +233,6 @@ def forget_vault(args):
 #     _xeno = Xenolyte()
 #     logging.debug(f"{args}")
 #     pass
-
 
 
 # def backup_vault(args):
@@ -293,6 +304,23 @@ VAULT_COMMANDS = [
 
 
 DATABASE_COMMANDS = [
+    {
+        "name": "fn",
+        "help": "Calls a function form functions.py.",
+        "func": call_function,
+        "arguments": [
+            {
+                "name": "table",
+                "type": str,
+                "help": "The name of the table to list records from"
+            },
+            {
+                "name": "function",
+                "type": str,
+                "help": "The name of the function to call form functions.py."
+            }
+        ]
+    },
     {
         "name": "listtables",
         "help": "List all records in a table",
