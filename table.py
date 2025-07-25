@@ -50,16 +50,23 @@ class Table:
                 return 0
         self.fieldnames.append(name)
         self.reflect_changes()
+
+# Let's say:
+# For standard tables there are only integer-indexes and incremention 
+# If you have a database you get e.g. uuid-indexes
+# You can implement your own ID-creatio scheme anyways           
             
-            
-    def create_record(self,new_record,index=False):
-        new_record["id"] = self.create_id()
+    def create_record(self,new_record,index=False,_id=False):
+        """If you insert inbetween, you are getting uuid automatically,
+        except when you provide a manual ID."""
         if index:
             if index < len(self.records):
+                new_record["id"] = _id if _id else self.create_id(_type="uuid")
                 self.records.insert(index,new_record)
             else:
                 logging.error(f"Index Argument is too big.")
         else:
+            new_record["id"] = _id if _id else self.create_id()
             self.records.append(new_record)
         self.reflect_changes()
     

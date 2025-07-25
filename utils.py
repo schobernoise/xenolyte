@@ -126,7 +126,11 @@ def write_csv(file,records,fieldnames):
         writer.writerows(records)
 
 
-def object_to_table(obj, indent=0):
+# TODO: Those two Table printing functions
+# are still from the AI.
+# Need to refactor them.
+
+def dict_to_table(obj, indent=0):
     if isinstance(obj, dict):
         properties = obj.keys()
         values = obj.values()
@@ -141,7 +145,7 @@ def object_to_table(obj, indent=0):
         if callable(val):
             val_str = f'<function {val.__name__}>'
         elif isinstance(val, dict) or hasattr(val, '__dict__'):
-            val_str = '\n' + object_to_table(val, indent + 2)
+            val_str = '\n' + dict_to_table(val, indent + 2)
         else:
             val_str = str(val)
         

@@ -77,7 +77,7 @@ def delete_table(args):
     if table:
         print(f"Deleting Container {args.table}!")
         print("Data Sample:")
-        print(utils.object_to_table(table.records[0:5]))
+        print(utils.dict_to_table(table.records[0:5]))
         choice = input("Are you sure? (y/n)" )
         if choice == "y":
             active_vault.delete_container(args.table)
@@ -180,7 +180,7 @@ def show_record(args):
     active_vault = _xeno.fetch_recent_vault()
     table = active_vault.get_container_from_name(args.table)
     record = table.fetch_record(args.record_id)
-    print(utils.object_to_table(record))
+    print(utils.dict_to_table(record))
 
 
 def list_records(args):
