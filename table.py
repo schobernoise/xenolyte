@@ -52,10 +52,15 @@ class Table:
         self.reflect_changes()
             
             
-    def create_record(self,new_record):
-        # TODO: Index Argument for inserting inbetween
+    def create_record(self,new_record,index=False):
         new_record["id"] = self.create_id()
-        self.records.append(new_record)
+        if index:
+            if index < len(self.records):
+                self.records.insert(index,new_record)
+            else:
+                logging.error(f"Index Argument is too big.")
+        else:
+            self.records.append(new_record)
         self.reflect_changes()
     
 

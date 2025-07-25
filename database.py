@@ -34,6 +34,7 @@ def fill_cells_w_xenolyte(self):
                 record[key] = "xenolyte"
     self.reflect_changes()"""
 
+
 class Database(table.Table):
 
         def __init__(self, path, records=False, init=False):
