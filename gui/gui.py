@@ -7,7 +7,8 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QIcon, QAction
 from PyQt6.QtCore import Qt, QFileSystemWatcher
-from .styles import DARK_STYLE
+from gui.styles import DARK_STYLE
+import utils
 
 
 class CSVViewer(QMainWindow):
@@ -67,26 +68,10 @@ class CSVViewer(QMainWindow):
         folders = []
         files = []
 
-        for entry in sorted(entries):
-            full_path = os.path.join(self.csv_directory, entry)
-            if os.path.isdir(full_path):
-                expected_csv = os.path.join(full_path, f"{entry}.csv")
-                if os.path.isfile(expected_csv):
-                    folders.append(entry)
-            elif entry.lower().endswith(".csv"):
-                files.append(entry)
+        pass
 
-        for folder in folders:
-            item = QListWidgetItem(self.folder_icon, folder)
-            item.setData(Qt.ItemDataRole.UserRole, "folder")
-            self.sidebar.addItem(item)
 
-        for filename in files:
-            item = QListWidgetItem(self.file_icon, filename)
-            item.setData(Qt.ItemDataRole.UserRole, "file")
-            self.sidebar.addItem(item)
-
-    def handle_item_click(self, item: QListWidgetItem):
+    def handle_item_click(self, item):
         entry_type = item.data(Qt.ItemDataRole.UserRole)
         entry_name = item.text()
 
@@ -101,24 +86,7 @@ class CSVViewer(QMainWindow):
             self.load_csv(path)
 
     def load_csv(self, path):
-        with open(path, newline='', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            rows = list(reader)
-
-        if not rows:
-            return
-
-        headers = rows[0]
-        data = rows[1:]
-
-        self.table.clear()
-        self.table.setRowCount(len(data))
-        self.table.setColumnCount(len(headers))
-        self.table.setHorizontalHeaderLabels(headers)
-
-        for r, row in enumerate(data):
-            for c, cell in enumerate(row):
-                self.table.setItem(r, c, QTableWidgetItem(cell))
+        pass
 
 
 def detect_os_dark_mode() -> bool:
@@ -137,7 +105,7 @@ def detect_os_dark_mode() -> bool:
     return False
 
 
-if __name__ == "__main__":
+def start_app():
     app = QApplication(sys.argv)
 
     directory = QFileDialog.getExistingDirectory(None, "Select Directory with CSV Files and Folders")
@@ -150,3 +118,5 @@ if __name__ == "__main__":
     viewer.show()
 
     sys.exit(app.exec())
+
+
